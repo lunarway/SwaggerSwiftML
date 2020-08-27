@@ -4,27 +4,24 @@
 import PackageDescription
 
 let package = Package(
-    name: "SwaggerKit",
+    name: "SwaggerSwiftML",
     products: [
         .library(
-            name: "SwaggerKit",
-            targets: ["SwaggerKit"]),
+            name: "SwaggerSwiftML",
+            targets: ["SwaggerSwiftML"]),
     ],
     dependencies: [
         .package(url: "https://github.com/jpsim/Yams.git", from: "3.0.1")
     ],
     targets: [
         .target(
-            name: "SwaggerKit",
+            name: "SwaggerSwiftML",
             dependencies: ["Yams"],
             resources: nil),
         .testTarget(
-            name: "SwaggerKitTests",
-            dependencies: ["SwaggerKit"],
+            name: "SwaggerSwiftMLTests",
+            dependencies: ["SwaggerSwiftML"],
             resources: [
-                // Copy Tests/ExampleTests/Resources directories as-is.
-                // Use to retain directory structure.
-                // Will be at top level in bundle.
                 .copy("BasicSwagger.yaml"),
                 .copy("Parameter"),
                 .copy("Schemas"),
