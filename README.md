@@ -1,4 +1,4 @@
-# OpenAPI 2.0 Parser
+# SwaggerSwiftML
 
 A description of this package.
 
