@@ -75,7 +75,11 @@ public struct Parameter: Decodable {
         case "number":
             type = .number(format: format, maximum: maximum, exclusiveMaximum: exclusiveMaximum, minimum: minimum, exclusiveMinimum: exclusiveMinimum, multipleOf: multipleOf)
         case "string":
-            type = .string(format: format, enumValues: enumeration, maxLength: maxLength, minLength: minLength, pattern: pattern)
+            type = .string(format: format,
+                           enumValues: enumeration,
+                           maxLength: maxLength,
+                           minLength: minLength,
+                           pattern: pattern)
         default:
             type = nil
         }
@@ -86,7 +90,7 @@ public struct Parameter: Decodable {
             self.location = .body(schema: schema)
         case "query":
             guard let stype = type else { throw SwaggerParseError.missingField }
-            let allowEmptyValue = try container.decode(Bool.self, forKey: .allowEmptyValue)
+            let allowEmptyValue = (try container.decodeIfPresent(Bool.self, forKey: .allowEmptyValue)) ?? false
             self.location = .query(type: stype, allowEmptyValue: allowEmptyValue)
         case "header":
             guard let stype = type else { throw SwaggerParseError.missingField }

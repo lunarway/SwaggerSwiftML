@@ -25,6 +25,7 @@ let package = Package(
                 .copy("BasicSwagger.yaml"),
                 .copy("Parameter"),
                 .copy("Schemas"),
+                .copy("Path"),
             ]),
     ]
 )
