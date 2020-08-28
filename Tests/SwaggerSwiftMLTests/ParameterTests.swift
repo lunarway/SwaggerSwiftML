@@ -1,6 +1,6 @@
 import XCTest
 import Yams
-@testable import SwaggerKit
+@testable import SwaggerSwiftML
 
 final class ParameterTests: XCTestCase {
     static var fileContents: String!

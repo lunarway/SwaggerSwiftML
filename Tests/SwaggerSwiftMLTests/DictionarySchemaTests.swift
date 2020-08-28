@@ -1,7 +1,7 @@
 import XCTest
 import Foundation
 import Yams
-@testable import SwaggerKit
+@testable import SwaggerSwiftML
 
 class DictionarySchemaTests: XCTestCase {
     private func load_schema(path: String) -> Schema {
@@ -118,7 +118,7 @@ class DictionarySchemaTests: XCTestCase {
     }
 }
 
-extension SwaggerKit.Node {
+extension SwaggerSwiftML.Node {
     var unwrapped: T? {
         switch self {
         case .node(let node): return node

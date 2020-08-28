@@ -1,5 +1,5 @@
 import XCTest
-@testable import SwaggerKit
+@testable import SwaggerSwiftML
 
 final class SwaggerParseBasicFile: XCTestCase {
     static var fileContents: String!

@@ -1,7 +1,7 @@
 import XCTest
 import Foundation
 import Yams
-@testable import SwaggerKit
+@testable import SwaggerSwiftML
 
 class SchemaTests: XCTestCase {
     func testParsePrimitiveSchema() {
