@@ -100,7 +100,7 @@ public struct Parameter: Decodable {
             self.location = .path(type: stype)
         case "formData":
             guard let stype = type else { throw SwaggerParseError.missingField }
-            let allowEmptyValue = try container.decode(Bool.self, forKey: .allowEmptyValue)
+            let allowEmptyValue = (try container.decodeIfPresent(Bool.self, forKey: .allowEmptyValue)) ?? false
             self.location = .formData(type: stype, allowEmptyValue: allowEmptyValue)
         default:
             throw SwaggerParseError.invalidField(location)

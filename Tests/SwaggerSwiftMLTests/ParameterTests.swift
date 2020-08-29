@@ -50,6 +50,16 @@ final class ParameterTests: XCTestCase {
 
         _ = try! YAMLDecoder().decode(Parameter.self, from: fileContents)
 
-//        XCTAssertEqual(parameter.location, .body)
+        //        XCTAssertEqual(parameter.location, .body)
+    }
+
+    func testFormDataLocation() {
+        let basicFileUrl = Bundle.module.url(forResource: "Parameter/formdata_param", withExtension: "yaml")
+
+        let fileContents = try! String(contentsOf: basicFileUrl!, encoding: .utf8)
+
+        _ = try! YAMLDecoder().decode(Parameter.self, from: fileContents)
+
+        //        XCTAssertEqual(parameter.location, .body)
     }
 }
