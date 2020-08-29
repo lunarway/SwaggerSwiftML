@@ -4,7 +4,7 @@ public enum ParameterLocation {
     case header(type: ParameterType)
     case path(type: ParameterType)
     case formData(type: ParameterType, allowEmptyValue: Bool)
-    case body(schema: Schema)
+    case body(schema: NodeWrapper<Schema>)
 
     var rawValue: String {
         switch self {

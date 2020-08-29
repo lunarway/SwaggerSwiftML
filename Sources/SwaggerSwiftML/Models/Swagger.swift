@@ -23,7 +23,7 @@ public struct Swagger: Decodable {
     /// An object to hold responses that can be used across operations. This property does not define global responses for all operations.
     public let responses: [String: Response]?
     /// Security scheme definitions that can be used across the specification.
-    public let securityDefinitions: [SecurityDefinition]?
+    public let securityDefinitions: [String: SecurityDefinition]?
     ///b A declaration of which security schemes are applied for the API as a whole. The list of values describes alternative security schemes that can be used (that is, there is a logical OR between the security requirements). Individual operations can override this definition.
     public let security: [String: SecurityRequirement]?
     /// A list of tags used by the specification with additional metadata. The order of the tags can be used to reflect on their order by the parsing tools. Not all tags that are used by the Operation Object must be declared. The tags that are not declared may be organized randomly or based on the tools' logic. Each tag name in the list MUST be unique.
@@ -34,11 +34,41 @@ public struct Swagger: Decodable {
     internal init() {
         fatalError("Dont call this")
     }
-}
 
-public enum Scheme: String, Codable {
-    case http
-    case https
-    case ws
-    case wss
+    enum CodingKeys: String, CodingKey {
+        case swagger
+        case info
+        case host
+        case basePath
+        case schemes
+        case consumes
+        case produces
+        case paths
+        case definitions
+        case parameters
+        case responses
+        case securityDefinitions
+        case security
+        case tags
+        case externalDocs
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.swagger = try container.decodeIfPresent(String.self.self, forKey: .swagger)
+        self.info = try container.decode(Info.self, forKey: .info)
+        self.host = try container.decodeIfPresent(String.self, forKey: .host)
+        self.basePath = try container.decodeIfPresent(String.self, forKey: .basePath)
+        self.schemes = try container.decodeIfPresent([Scheme].self, forKey: .schemes)
+        self.consumes = try container.decodeIfPresent([String].self, forKey: .consumes)
+        self.produces = try container.decodeIfPresent([String].self, forKey: .produces)
+        self.paths = try container.decode([String: Path].self, forKey: .paths)
+        self.definitions = try container.decodeIfPresent([String: Schema].self, forKey: .definitions)
+        self.parameters = try container.decodeIfPresent([String: Parameter].self, forKey: .parameters)
+        self.responses = try container.decodeIfPresent([String: Response].self, forKey: .responses)
+        self.securityDefinitions = try container.decodeIfPresent([String: SecurityDefinition].self, forKey: .securityDefinitions)
+        self.security = try container.decodeIfPresent([String: SecurityRequirement].self, forKey: .security)
+        self.tags = try container.decodeIfPresent([Tag].self, forKey: .tags)
+        self.externalDocs = try container.decodeIfPresent([ExternalDocumentation].self, forKey: .externalDocs)
+    }
 }

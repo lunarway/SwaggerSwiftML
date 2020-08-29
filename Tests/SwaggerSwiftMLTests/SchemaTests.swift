@@ -36,12 +36,7 @@ class SchemaTests: XCTestCase {
             case .reference:
                 XCTAssert(false, "should not find a reference")
             case .node(let property):
-                guard let type = property.type else {
-                    XCTAssert(false)
-                    return
-                }
-
-                switch type {
+                switch property.type {
                 case .string(format: let format, enumValues: let enumValues, maxLength: let maxLength, minLength: let minLength, pattern: let pattern):
                     XCTAssertNil(format)
                     XCTAssertNil(enumValues)
@@ -49,7 +44,7 @@ class SchemaTests: XCTestCase {
                     XCTAssertNil(minLength)
                     XCTAssertNil(pattern)
                 default:
-                    XCTAssert(false, "Found type: \(type)")
+                    XCTAssert(false, "Found type: \(property.type)")
                 }
             }
 
@@ -68,12 +63,7 @@ class SchemaTests: XCTestCase {
             case .reference:
                 XCTAssert(false, "should not find a reference")
             case .node(let property):
-                guard let type = property.type else {
-                    XCTAssert(false)
-                    return
-                }
-
-                switch type {
+                switch property.type {
                 case .integer(format: let format, maximum: let maximum, exclusiveMaximum: let exclusiveMaximum, minimum: let minimum, exclusiveMinimum: let exclusiveMinimum, multipleOf: let multipleOf):
                     XCTAssertNotNil(format)
                     XCTAssertEqual(format!, .int32)
@@ -83,10 +73,47 @@ class SchemaTests: XCTestCase {
                     XCTAssertNil(exclusiveMinimum)
                     XCTAssertNil(exclusiveMaximum)
                 default:
-                    XCTAssert(false, "Found type: \(type)")
+                    XCTAssert(false, "Found type: \(property.type)")
                 }
             }
         default:
+            XCTAssert(false)
+        }
+    }
+
+    // MARK: Definitions
+
+    func testParseSimpleDefinition() {
+        let basicFileUrl = Bundle.module.url(forResource: "Schemas/definition_schema", withExtension: "yaml")
+
+        let fileContents = try! String(contentsOf: basicFileUrl!, encoding: .utf8)
+
+        let schema = try! YAMLDecoder().decode(Schema.self, from: fileContents)
+
+        if case let SchemaType.object(properties: properties) = schema.type {
+            XCTAssertEqual(2, properties.count)
+        } else {
+            XCTAssert(false, "Wrong type on definition")
+        }
+    }
+
+    // MARK: Array
+
+    func testArrayWithObjectReference() {
+        let basicFileUrl = Bundle.module.url(forResource: "Items/items_object_ref", withExtension: "yaml")
+
+        let fileContents = try! String(contentsOf: basicFileUrl!, encoding: .utf8)
+
+        let schema = try! YAMLDecoder().decode(Schema.self, from: fileContents)
+
+        if case let SchemaType.array(node, _, _, _, _) = schema.type {
+            switch node {
+            case .reference(let ref):
+                XCTAssertEqual(ref, "#/definitions/ItemTypes")
+            default:
+                XCTAssert(false)
+            }
+        } else {
             XCTAssert(false)
         }
     }

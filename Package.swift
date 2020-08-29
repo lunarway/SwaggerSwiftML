@@ -26,6 +26,8 @@ let package = Package(
                 .copy("Parameter"),
                 .copy("Schemas"),
                 .copy("Path"),
+                .copy("Swagger"),
+                .copy("Items"),
             ]),
     ]
 )

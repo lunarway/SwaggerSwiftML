@@ -86,7 +86,7 @@ public struct Parameter: Decodable {
 
         switch location {
         case "body":
-            let schema = try container.decode(Schema.self, forKey: .schema)
+            let schema = try container.decode(NodeWrapper<Schema>.self, forKey: .schema)
             self.location = .body(schema: schema)
         case "query":
             guard let stype = type else { throw SwaggerParseError.missingField }
@@ -103,7 +103,7 @@ public struct Parameter: Decodable {
             let allowEmptyValue = try container.decode(Bool.self, forKey: .allowEmptyValue)
             self.location = .formData(type: stype, allowEmptyValue: allowEmptyValue)
         default:
-            throw SwaggerParseError.invalidField
+            throw SwaggerParseError.invalidField(location)
         }
     }
 }

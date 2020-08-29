@@ -1,4 +1,4 @@
 enum SwaggerParseError: Error {
     case missingField
-    case invalidField
+    case invalidField(String)
 }

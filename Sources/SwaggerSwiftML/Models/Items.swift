@@ -57,7 +57,7 @@ public struct Items: Decodable {
         case "string":
             self.type = .string(format: format, enumValues: enumeration, maxLength: maxLength, minLength: minLength, pattern: pattern)
         default:
-            throw SwaggerParseError.invalidField
+            throw SwaggerParseError.invalidField(typeString ?? "No field found on Items")
         }
     }
 }

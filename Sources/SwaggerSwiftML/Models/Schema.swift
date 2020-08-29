@@ -10,7 +10,7 @@ public indirect enum SchemaType {
     case number(format: DataFormat?, maximum: Int?, exclusiveMaximum: Bool?, minimum: Int?, exclusiveMinimum: Bool?, multipleOf: Int?)
     case integer(format: DataFormat?, maximum: Int?, exclusiveMaximum: Bool?, minimum: Int?, exclusiveMinimum: Bool?, multipleOf: Int?)
     case boolean
-    case array(Items, collectionFormat: CollectionFormat, maxItems: Int?, minItems: Int?, uniqueItems: Bool)
+    case array(Node<Items>, collectionFormat: CollectionFormat, maxItems: Int?, minItems: Int?, uniqueItems: Bool)
     case object(properties: [String: NodeWrapper<Schema>])
 
     // The schema represents a dictionary type, i.e. a [String: <something>]
@@ -36,7 +36,7 @@ public struct Schema: Decodable {
     public let maxProperties: Int?
     public let minProperties: Int?
     public let required: [String]
-    public let type: SchemaType?
+    public let type: SchemaType
 //    public let allOf: [NodeWrapper<Schema>]?
 
     enum CodingKeys: String, CodingKey {
@@ -87,8 +87,18 @@ public struct Schema: Decodable {
         self.required = (try container.decodeIfPresent([String].self, forKey: .required)) ?? []
         let enumeration = try container.decodeIfPresent([String].self, forKey: .enumeration)
 
-        let typeString = try container.decodeIfPresent(String.self, forKey: .type)
-        switch typeString {
+        var typeString = try container.decodeIfPresent(String.self, forKey: .type)
+        if typeString == nil {
+            if container.contains(.properties) {
+                typeString = "object"
+            } else {
+                throw SwaggerError.failedToParse
+            }
+        }
+
+        guard typeString != nil else { fatalError("Failed to find type on schema") }
+
+        switch typeString! {
         case "object":
             let isDictionary = container.contains(.additionalProperties)
             let properties = (try? container.decodeIfPresent([String: Schema].self, forKey: .properties)) ?? [:]
@@ -101,10 +111,10 @@ public struct Schema: Decodable {
             }
 
             if isDictionary {
-                if let schema = try? container.decodeIfPresent(Schema.self, forKey: .additionalProperties) {
-                    self.type = .dictionary(valueType: .schema(schema), keys: keys)
-                } else if let reference = try? container.decodeIfPresent(Reference.self, forKey: .additionalProperties) {
+                if let reference = try? container.decodeIfPresent(Reference.self, forKey: .additionalProperties) {
                     self.type = .dictionary(valueType: .reference(reference.ref), keys: keys)
+                } else if let schema = try? container.decodeIfPresent(Schema.self, forKey: .additionalProperties) {
+                    self.type = .dictionary(valueType: .schema(schema), keys: keys)
                 } else if let boolValue = try? container.decodeIfPresent(Bool.self, forKey: .additionalProperties) {
                     guard boolValue == true else { fatalError("additionalProperties set to false doesnt have any meaning") }
                     self.type = .dictionary(valueType: .any, keys: keys)
@@ -112,8 +122,8 @@ public struct Schema: Decodable {
                     self.type = .dictionary(valueType: .any, keys: keys)
                 }
             } else {
-                let properties = (try container.decodeIfPresent([String: NodeWrapper<Schema>].self, forKey: .properties)) ?? [:]
-                self.type = .object(properties: properties)
+                let properties = try container.decodeIfPresent([String: NodeWrapper<Schema>].self, forKey: .properties)
+                self.type = .object(properties: properties ?? [:])
             }
         case "string":
             self.type = .string(format: format, enumValues: enumeration, maxLength: maxLength, minLength: minLength, pattern: pattern)
@@ -126,10 +136,19 @@ public struct Schema: Decodable {
         case "array":
             let uniqueItems = (try container.decodeIfPresent(Bool.self, forKey: .uniqueItems) ?? false)
             let collectionFormat = (try container.decodeIfPresent(CollectionFormat.self, forKey: .collectionFormat)) ?? .csv
-            let items = try container.decode(Items.self, forKey: .items)
-            self.type = .array(items, collectionFormat: collectionFormat, maxItems: maxItems, minItems: minItems, uniqueItems: uniqueItems)
+
+            let node: Node<Items>
+            if let itemsObject = try? container.decode(Items.self, forKey: .items) {
+                node = .node(itemsObject)
+            } else if let ref = try? container.decode(Reference.self, forKey: .items) {
+                node = .reference(ref.ref)
+            } else {
+                throw SwaggerError.corruptFile
+            }
+
+            self.type = .array(node, collectionFormat: collectionFormat, maxItems: maxItems, minItems: minItems, uniqueItems: uniqueItems)
         default:
-            throw SchemaParseError.invalidType(typeString ?? "none found")
+            throw SchemaParseError.invalidType("Unsupported type: \(typeString!) found on a schema")
         }
 //        self.items = container.decodeIfPresent(String.self, forKey: .items)
 //        self.allOf = container.decodeIfPresent(String.self, forKey: .allOf)
