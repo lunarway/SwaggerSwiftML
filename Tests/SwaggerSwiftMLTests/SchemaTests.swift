@@ -97,6 +97,20 @@ class SchemaTests: XCTestCase {
         }
     }
 
+    func testParseComplexDefinition() {
+        let basicFileUrl = Bundle.module.url(forResource: "Schemas/complex_model", withExtension: "yaml")
+
+        let fileContents = try! String(contentsOf: basicFileUrl!, encoding: .utf8)
+
+        let schema = try! YAMLDecoder().decode(Schema.self, from: fileContents)
+
+        if case let SchemaType.object(properties: properties) = schema.type {
+            XCTAssertEqual(4, properties.count)
+        } else {
+            XCTAssert(false, "Wrong type on definition")
+        }
+    }
+
     // MARK: Array
 
     func testArrayWithObjectReference() {

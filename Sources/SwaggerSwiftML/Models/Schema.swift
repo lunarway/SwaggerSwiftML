@@ -101,16 +101,17 @@ public struct Schema: Decodable {
         switch typeString! {
         case "object":
             let isDictionary = container.contains(.additionalProperties)
-            let properties = (try? container.decodeIfPresent([String: Schema].self, forKey: .properties)) ?? [:]
-            let required = (try container.decodeIfPresent([String].self, forKey: .required)) ?? []
-
-            let keys = properties.map { prop in
-                KeyType(name: prop.key,
-                        type: prop.value,
-                        required: required.contains(prop.key))
-            }
 
             if isDictionary {
+                let properties = (try? container.decodeIfPresent([String: Schema].self, forKey: .properties)) ?? [:]
+                let required = (try container.decodeIfPresent([String].self, forKey: .required)) ?? []
+
+                let keys = properties.map { prop in
+                    KeyType(name: prop.key,
+                            type: prop.value,
+                            required: required.contains(prop.key))
+                }
+
                 if let reference = try? container.decodeIfPresent(Reference.self, forKey: .additionalProperties) {
                     self.type = .dictionary(valueType: .reference(reference.ref), keys: keys)
                 } else if let schema = try? container.decodeIfPresent(Schema.self, forKey: .additionalProperties) {
@@ -150,10 +151,6 @@ public struct Schema: Decodable {
         default:
             throw SchemaParseError.invalidType("Unsupported type: \(typeString!) found on a schema")
         }
-//        self.items = container.decodeIfPresent(String.self, forKey: .items)
-//        self.allOf = container.decodeIfPresent(String.self, forKey: .allOf)
-//        self.properties = container.decodeIfPresent(String.self, forKey: .properties)
-//        self.additionalProperties = container.decodeIfPresent(Bool.self, forKey: .additionalProperties)
     }
 }
 
