@@ -9,7 +9,6 @@ class SwaggerTests: XCTestCase {
 
         let fileContents = try! String(contentsOf: basicFileUrl!, encoding: .utf8)
 
-        let swagger = try! YAMLDecoder().decode(Swagger.self, from: fileContents)
-
+        _ = try! YAMLDecoder().decode(Swagger.self, from: fileContents)
     }
 }
