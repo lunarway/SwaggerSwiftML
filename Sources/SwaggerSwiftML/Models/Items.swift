@@ -1,5 +1,5 @@
 public struct Items: Decodable {
-    public let type: ParameterType?
+    public let type: ParameterType
 
     enum CodingKeys: String, CodingKey {
         case type
@@ -27,7 +27,6 @@ public struct Items: Decodable {
         let typeString = try container.decodeIfPresent(String.self, forKey: .type) // ParameterType
         let format = try container.decodeIfPresent(DataFormat.self, forKey: .format)
 
-        
         let maximum = try container.decodeIfPresent(Int.self, forKey: .maximum)
         let exclusiveMaximum = try container.decodeIfPresent(Bool.self, forKey: .exclusiveMaximum)
         let minimum = try container.decodeIfPresent(Int.self, forKey: .minimum)
