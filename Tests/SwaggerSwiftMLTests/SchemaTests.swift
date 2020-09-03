@@ -28,11 +28,11 @@ class SchemaTests: XCTestCase {
         let schema = try! YAMLDecoder().decode(Schema.self, from: fileContents)
 
         switch schema.type {
-        case .object(let properties):
+        case .object(let properties, _):
             XCTAssertTrue(true)
             let nameProperty = properties["name"]!
             XCTAssertNotNil(nameProperty)
-            switch nameProperty.value {
+            switch nameProperty {
             case .reference:
                 XCTAssert(false, "should not find a reference")
             case .node(let property):
@@ -50,7 +50,7 @@ class SchemaTests: XCTestCase {
 
             let addressProperty = properties["address"]!
             XCTAssertNotNil(addressProperty)
-            switch addressProperty.value {
+            switch addressProperty {
             case .reference(let ref):
                 XCTAssertEqual(ref, "#/definitions/Address")
             default:
@@ -59,7 +59,7 @@ class SchemaTests: XCTestCase {
 
             let ageProperty = properties["age"]!
             XCTAssertNotNil(ageProperty)
-            switch ageProperty.value {
+            switch ageProperty {
             case .reference:
                 XCTAssert(false, "should not find a reference")
             case .node(let property):
@@ -90,7 +90,7 @@ class SchemaTests: XCTestCase {
 
         let schema = try! YAMLDecoder().decode(Schema.self, from: fileContents)
 
-        if case let SchemaType.object(properties: properties) = schema.type {
+        if case let SchemaType.object(properties: properties, _) = schema.type {
             XCTAssertEqual(2, properties.count)
         } else {
             XCTAssert(false, "Wrong type on definition")
@@ -104,7 +104,7 @@ class SchemaTests: XCTestCase {
 
         let schema = try! YAMLDecoder().decode(Schema.self, from: fileContents)
 
-        if case let SchemaType.object(properties: properties) = schema.type {
+        if case let SchemaType.object(properties: properties, _) = schema.type {
             XCTAssertEqual(4, properties.count)
         } else {
             XCTAssert(false, "Wrong type on definition")
@@ -130,5 +130,20 @@ class SchemaTests: XCTestCase {
         } else {
             XCTAssert(false)
         }
+    }
+
+    // MARK: AnyOf
+
+    func testParseAnyOfObjects() {
+        let basicFileUrl = Bundle.module.url(forResource: "Schemas/allOf/allof_object", withExtension: "yaml")
+
+        let fileContents = try! String(contentsOf: basicFileUrl!, encoding: .utf8)
+
+        let schema = try! YAMLDecoder().decode(Schema.self, from: fileContents)
+
+        guard case let SchemaType.object(properties: properties, allOf) = schema.type else { XCTAssert(false); return }
+
+        XCTAssert(properties.isEmpty)
+        XCTAssertEqual(allOf?.count, 2)
     }
 }

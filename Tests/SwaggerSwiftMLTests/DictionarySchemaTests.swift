@@ -84,14 +84,14 @@ class DictionarySchemaTests: XCTestCase {
         // verify that the value type is a string
         if case let SchemaType.dictionary(valueType: valueType, _) = schema.type {
             if case let DictionaryValueType.schema(schema) = valueType {
-                if case let SchemaType.object(properties: props) = schema.type {
-                    let codeProp = props["code"]!.value.unwrapped!
+                if case let SchemaType.object(properties: props, _) = schema.type {
+                    let codeProp = props["code"]!.unwrapped!
 
                     if case SchemaType.integer = codeProp.type {
                         XCTAssert(true)
                     } else { XCTAssert(false) }
 
-                    let textProp = props["text"]!.value.unwrapped!
+                    let textProp = props["text"]!.unwrapped!
 
                     if case SchemaType.string = textProp.type {
                         XCTAssert(true)

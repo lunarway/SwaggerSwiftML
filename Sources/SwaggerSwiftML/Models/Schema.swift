@@ -6,7 +6,6 @@ public struct Schema: Decodable {
     public let minProperties: Int?
     public let required: [String]
     public let type: SchemaType
-//    public let allOf: [NodeWrapper<Schema>]?
 
     enum CodingKeys: String, CodingKey {
         case format
@@ -92,8 +91,9 @@ public struct Schema: Decodable {
                     self.type = .dictionary(valueType: .any, keys: keys)
                 }
             } else {
-                let properties = try container.decodeIfPresent([String: NodeWrapper<Schema>].self, forKey: .properties)
-                self.type = .object(properties: properties ?? [:])
+                let allOf = try container.decodeIfPresent([NodeWrapper<Schema>].self, forKey: .allOf).map { $0.map { $0.value } }
+                let properties = try container.decodeIfPresent([String: NodeWrapper<Schema>].self, forKey: .properties)?.compactMapValues { $0.value }
+                self.type = .object(properties: properties ?? [:], allOf: allOf)
             }
         case "string":
             self.type = .string(format: format, enumValues: enumeration, maxLength: maxLength, minLength: minLength, pattern: pattern)
