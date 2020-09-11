@@ -81,6 +81,17 @@ class SchemaTests: XCTestCase {
         }
     }
 
+    // MARK: Date
+
+    func testParseDate() {
+        let basicFileUrl = Bundle.module.url(forResource: "Schemas/iso8601_date", withExtension: "yaml")
+
+        let fileContents = try! String(contentsOf: basicFileUrl!, encoding: .utf8)
+
+        let schema = try! YAMLDecoder().decode(Schema.self, from: fileContents)
+
+    }
+
     // MARK: Definitions
 
     func testParseSimpleDefinition() {
