@@ -1,14 +1,10 @@
+// Describes a single response from an API Operation.
 public struct RequestResponse: Decodable {
+    // A short description of the response
     public let description: String?
-    /// Used to tell the code generator what to call the method
-    public let operationId: String?
-    public let deprecated: Bool?
+    /// A definition of the response structure. It can be a primitive, an array or an object. If this field does not exist, it means no content is returned as part of the
+    /// response. As an extension to the Schema Object, its root type value may also be "file". This SHOULD be accompanied by a relevant produces mime-type.
     public let schema: NodeWrapper<Schema>?
-
-    enum CodingKeys: String, CodingKey {
-        case description
-        case schema
-        case operationId
-        case deprecated
-    }
+    // A list of headers that are sent with the response.
+    public let headers: [String: Header]?
 }
