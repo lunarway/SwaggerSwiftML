@@ -32,7 +32,7 @@ public struct Items: Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        let typeString = try container.decodeIfPresent(String.self, forKey: .type) // ParameterType
+        let typeString = try container.decodeIfPresent(String.self, forKey: .type)
         let format = try container.decodeIfPresent(DataFormat.self, forKey: .format)
 
         let maximum = try container.decodeIfPresent(Int.self, forKey: .maximum)
@@ -47,7 +47,7 @@ public struct Items: Decodable {
         let uniqueItems = try container.decodeIfPresent(Bool.self, forKey: .uniqueItems)
         let enumeration = try container.decodeIfPresent([String].self, forKey: .enumeration)
         let multipleOf = try container.decodeIfPresent(Int.self, forKey: .multipleOf)
-w
+
         switch typeString {
         case "array":
             let collectionFormat = (try container.decodeIfPresent(CollectionFormat.self, forKey: .collectionFormat)) ?? .csv
