@@ -1,5 +1,13 @@
+public indirect enum ItemsType {
+    case string(format: DataFormat?, enumValues: [String]?, maxLength: Int?, minLength: Int?, pattern: String?)
+    case number(format: DataFormat?, maximum: Int?, exclusiveMaximum: Bool?, minimum: Int?, exclusiveMinimum: Bool?, multipleOf: Int?)
+    case integer(format: DataFormat?, maximum: Int?, exclusiveMaximum: Bool?, minimum: Int?, exclusiveMinimum: Bool?, multipleOf: Int?)
+    case boolean
+    case array(Items, collectionFormat: CollectionFormat, maxItems: Int?, minItems: Int?, uniqueItems: Bool)
+}
+
 public struct Items: Decodable {
-    public let type: ParameterType
+    public let type: ItemsType
 
     enum CodingKeys: String, CodingKey {
         case type
@@ -39,7 +47,7 @@ public struct Items: Decodable {
         let uniqueItems = try container.decodeIfPresent(Bool.self, forKey: .uniqueItems)
         let enumeration = try container.decodeIfPresent([String].self, forKey: .enumeration)
         let multipleOf = try container.decodeIfPresent(Int.self, forKey: .multipleOf)
-
+w
         switch typeString {
         case "array":
             let collectionFormat = (try container.decodeIfPresent(CollectionFormat.self, forKey: .collectionFormat)) ?? .csv
@@ -47,8 +55,6 @@ public struct Items: Decodable {
             self.type = .array(items, collectionFormat: collectionFormat, maxItems: maxItems, minItems: minItems, uniqueItems: uniqueItems ?? false)
         case "boolean":
             self.type = .boolean
-        case "file":
-            self.type = .file
         case "integer":
             self.type = .integer(format: format, maximum: maximum, exclusiveMaximum: exclusiveMaximum, minimum: minimum, exclusiveMinimum: exclusiveMinimum, multipleOf: multipleOf)
         case "number":
