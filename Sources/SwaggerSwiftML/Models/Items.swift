@@ -4,6 +4,7 @@ public indirect enum ItemsType {
     case integer(format: DataFormat?, maximum: Int?, exclusiveMaximum: Bool?, minimum: Int?, exclusiveMinimum: Bool?, multipleOf: Int?)
     case boolean
     case array(Items, collectionFormat: CollectionFormat, maxItems: Int?, minItems: Int?, uniqueItems: Bool)
+    case object(properties: [String: Node<Schema>], allOf: [Node<Schema>]?)
 }
 
 public struct Items: Decodable {
@@ -27,6 +28,10 @@ public struct Items: Decodable {
         case uniqueItems
         case enumeration = "enum"
         case multipleOf
+        case additionalProperties
+        case allOf
+        case properties
+        case required
     }
 
     public init(from decoder: Decoder) throws {
@@ -61,6 +66,15 @@ public struct Items: Decodable {
             self.type = .number(format: format, maximum: maximum, exclusiveMaximum: exclusiveMaximum, minimum: minimum, exclusiveMinimum: exclusiveMinimum, multipleOf: multipleOf)
         case "string":
             self.type = .string(format: format, enumValues: enumeration, maxLength: maxLength, minLength: minLength, pattern: pattern)
+        case "object":
+            let isDictionary = container.contains(.additionalProperties)
+            if isDictionary {
+                fatalError("I dont support dictionaries in arrays... yet")
+            }
+
+            let allOf = try container.decodeIfPresent([NodeWrapper<Schema>].self, forKey: .allOf).map { $0.map { $0.value } }
+            let properties = try container.decodeIfPresent([String: NodeWrapper<Schema>].self, forKey: .properties)?.compactMapValues { $0.value }
+            self.type = .object(properties: properties ?? [:], allOf: allOf)
         default:
             throw SwaggerParseError.invalidField(typeString ?? "No field found on Items")
         }
