@@ -28,6 +28,8 @@ let package = Package(
                 .copy("Path"),
                 .copy("Swagger"),
                 .copy("Items"),
+                .copy("swag.yaml"),
+                .copy("Operation"),
             ]),
     ]
 )

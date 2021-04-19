@@ -1,3 +1,5 @@
+import Foundation
+
 /// Describes a single API operation on a path.
 public struct Operation: Decodable {
     /// A list of tags for API documentation control. Tags can be used for logical grouping of operations by resources or any other qualifier.
@@ -24,6 +26,7 @@ public struct Operation: Decodable {
     public let deprecated: Bool
     /// A declaration of which security schemes are applied for this operation. The list of values describes alternative security schemes that can be used (that is, there is a logical OR between the security requirements). This definition overrides any declared top-level security. To remove a top-level security declaration, an empty array can be used.
 //    public let security: SecurityRequirement?
+    public let customFields: [String: String]
 
     enum CodingKeys: String, CodingKey {
         case tags
@@ -38,6 +41,18 @@ public struct Operation: Decodable {
         case schemes
         case deprecated
         case security
+    }
+
+    private struct CustomCodingKeys: CodingKey {
+        var intValue: Int?
+        var stringValue: String
+
+        init?(intValue: Int) { self.intValue = intValue; self.stringValue = "\(intValue)" }
+        init?(stringValue: String) { self.stringValue = stringValue }
+
+        static func make(key: String) -> CodingKeys {
+            return CodingKeys(stringValue: key)!
+        }
     }
 
     public init(from decoder: Decoder) throws {
@@ -67,8 +82,16 @@ public struct Operation: Decodable {
             self.parameters = nil
         }
 
+        let unknownKeysContainer = try decoder.container(keyedBy: CustomCodingKeys.self)
+        let keys = unknownKeysContainer.allKeys.filter { $0.stringValue.starts(with: "x-", by: { $0 == $1  }) }
+
+        var customFields = [String: String]()
+        keys.map { ($0.stringValue, try? unknownKeysContainer.decode(String.self, forKey: $0)) }
+            .forEach { key, value in customFields[key] = value }
+
         self.schemes = try con.decodeIfPresent([Scheme].self, forKey: .schemes)
         self.deprecated = try con.decodeIfPresent(Bool.self, forKey: .deprecated) ?? false
 //        self.security = try con.decodeIfPresent(SecurityRequirement.self, forKey: .security)
+        self.customFields = customFields
     }
 }
