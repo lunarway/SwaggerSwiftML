@@ -43,18 +43,6 @@ public struct Operation: Decodable {
         case security
     }
 
-    private struct CustomCodingKeys: CodingKey {
-        var intValue: Int?
-        var stringValue: String
-
-        init?(intValue: Int) { self.intValue = intValue; self.stringValue = "\(intValue)" }
-        init?(stringValue: String) { self.stringValue = stringValue }
-
-        static func make(key: String) -> CodingKeys {
-            return CodingKeys(stringValue: key)!
-        }
-    }
-
     public init(from decoder: Decoder) throws {
         let con = try decoder.container(keyedBy: CodingKeys.self)
 //        self.tags = try con.decodeIfPresent([Tag].self, forKey: .tags)
@@ -82,16 +70,16 @@ public struct Operation: Decodable {
             self.parameters = nil
         }
 
-        let unknownKeysContainer = try decoder.container(keyedBy: CustomCodingKeys.self)
+        let unknownKeysContainer = try decoder.container(keyedBy: RawCodingKeys.self)
         let keys = unknownKeysContainer.allKeys.filter { $0.stringValue.starts(with: "x-", by: { $0 == $1  }) }
 
         var customFields = [String: String]()
         keys.map { ($0.stringValue, try? unknownKeysContainer.decode(String.self, forKey: $0)) }
             .forEach { key, value in customFields[key] = value }
+        self.customFields = customFields
 
         self.schemes = try con.decodeIfPresent([Scheme].self, forKey: .schemes)
         self.deprecated = try con.decodeIfPresent(Bool.self, forKey: .deprecated) ?? false
 //        self.security = try con.decodeIfPresent(SecurityRequirement.self, forKey: .security)
-        self.customFields = customFields
     }
 }

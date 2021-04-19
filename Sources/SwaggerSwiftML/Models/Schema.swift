@@ -6,6 +6,7 @@ public struct Schema: Decodable {
     public let minProperties: Int?
     public let required: [String]
     public let type: SchemaType
+    public let customFields: [String: String]
 
     enum CodingKeys: String, CodingKey {
         case format
@@ -34,6 +35,18 @@ public struct Schema: Decodable {
         case collectionFormat
     }
 
+    private struct CustomCodingKeys: CodingKey {
+        var intValue: Int?
+        var stringValue: String
+
+        init?(intValue: Int) { self.intValue = intValue; self.stringValue = "\(intValue)" }
+        init?(stringValue: String) { self.stringValue = stringValue }
+
+        static func make(key: String) -> CodingKeys {
+            return CodingKeys(stringValue: key)!
+        }
+    }
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let format = try container.decodeIfPresent(DataFormat.self, forKey: .format)
@@ -54,6 +67,14 @@ public struct Schema: Decodable {
         self.minProperties = try container.decodeIfPresent(Int.self, forKey: .minProperties)
         self.required = (try container.decodeIfPresent([String].self, forKey: .required)) ?? []
         let enumeration = try container.decodeIfPresent([String].self, forKey: .enumeration)
+
+        let unknownKeysContainer = try decoder.container(keyedBy: RawCodingKeys.self)
+        let keys = unknownKeysContainer.allKeys.filter { $0.stringValue.starts(with: "x-", by: { $0 == $1  }) }
+
+        var customFields = [String: String]()
+        keys.map { ($0.stringValue, try? unknownKeysContainer.decode(String.self, forKey: $0)) }
+            .forEach { key, value in customFields[key] = value }
+        self.customFields = customFields
 
         var typeString = try container.decodeIfPresent(String.self, forKey: .type)
         if typeString == nil {
