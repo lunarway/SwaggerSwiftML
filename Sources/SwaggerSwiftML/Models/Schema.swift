@@ -137,7 +137,11 @@ public struct Schema: Decodable {
                 throw SwaggerError.corruptFile
             }
 
-            self.type = .array(node, collectionFormat: collectionFormat, maxItems: maxItems, minItems: minItems, uniqueItems: uniqueItems)
+            self.type = .array(node,
+                               collectionFormat: collectionFormat,
+                               maxItems: maxItems,
+                               minItems: minItems,
+                               uniqueItems: uniqueItems)
         default:
             throw SchemaParseError.invalidType("Unsupported type: \(typeString!) found on a schema")
         }

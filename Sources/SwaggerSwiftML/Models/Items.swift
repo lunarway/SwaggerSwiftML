@@ -4,7 +4,7 @@ public indirect enum ItemsType {
     case integer(format: DataFormat?, maximum: Int?, exclusiveMaximum: Bool?, minimum: Int?, exclusiveMinimum: Bool?, multipleOf: Int?)
     case boolean
     case array(Items, collectionFormat: CollectionFormat, maxItems: Int?, minItems: Int?, uniqueItems: Bool)
-    case object(properties: [String: Node<Schema>], allOf: [Node<Schema>]?)
+    case object(required: [String], properties: [String: Node<Schema>], allOf: [Node<Schema>]?)
 }
 
 public struct Items: Decodable {
@@ -52,6 +52,7 @@ public struct Items: Decodable {
         let uniqueItems = try container.decodeIfPresent(Bool.self, forKey: .uniqueItems)
         let enumeration = try container.decodeIfPresent([String].self, forKey: .enumeration)
         let multipleOf = try container.decodeIfPresent(Int.self, forKey: .multipleOf)
+        let required = try container.decodeIfPresent([String].self, forKey: .required)
 
         switch typeString {
         case "array":
@@ -72,9 +73,13 @@ public struct Items: Decodable {
                 fatalError("I dont support dictionaries in arrays... yet")
             }
 
-            let allOf = try container.decodeIfPresent([NodeWrapper<Schema>].self, forKey: .allOf).map { $0.map { $0.value } }
-            let properties = try container.decodeIfPresent([String: NodeWrapper<Schema>].self, forKey: .properties)?.compactMapValues { $0.value }
-            self.type = .object(properties: properties ?? [:], allOf: allOf)
+            let allOf = try container.decodeIfPresent([NodeWrapper<Schema>].self, forKey: .allOf)
+                .map { $0.map { $0.value } }
+
+            let properties = try container.decodeIfPresent([String: NodeWrapper<Schema>].self,
+                                                           forKey: .properties)?.compactMapValues { $0.value }
+
+            self.type = .object(required: required ?? [], properties: properties ?? [:], allOf: allOf)
         default:
             throw SwaggerParseError.invalidField(typeString ?? "No field found on Items")
         }

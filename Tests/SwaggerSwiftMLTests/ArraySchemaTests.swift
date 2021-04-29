@@ -20,4 +20,23 @@ class ArraySchemaTests: XCTestCase {
             XCTAssert(false)
         }
     }
+
+    func testParseArrayRequired() {
+        let schema = load_schema(path: "Schemas/arrays/array")
+        if case let SchemaType.array(items, collectionFormat: _, maxItems: _, minItems: _, uniqueItems: _) = schema.type {
+            switch items {
+            case .node(let items):
+                switch items.type {
+                case .object(let required, properties: _, allOf: _):
+                    XCTAssertEqual(3, required.count)
+                default:
+                    XCTAssert(false)
+                }
+            default:
+                XCTAssert(false)
+            }
+        } else {
+            XCTAssert(false)
+        }
+    }
 }
