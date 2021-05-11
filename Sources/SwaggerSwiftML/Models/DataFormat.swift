@@ -14,9 +14,9 @@ public enum DataFormat: Decodable {
     // any sequence of octets
     case binary
     case boolean
-    // As defined by full-date - RFC3339
+    // full-date notation as defined by RFC 3339, section 5.6, for example, 2017-07-21
     case date
-    // As defined by date-time - RFC3339
+    // the date-time notation as defined by RFC 3339, section 5.6, for example, 2017-07-21T17:32:28Z
     case dateTime
     // Used to hint UIs the input needs to be obscured.
     case password
@@ -46,7 +46,7 @@ public enum DataFormat: Decodable {
             self = .boolean
         case "date":
             self = .date
-        case "dateTime":
+        case "date-time":
             self = .dateTime
         case "password":
             self = .password
