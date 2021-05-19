@@ -37,7 +37,6 @@ public struct Items: Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        let typeString = try container.decodeIfPresent(String.self, forKey: .type)
         let format = try container.decodeIfPresent(DataFormat.self, forKey: .format)
 
         let maximum = try container.decodeIfPresent(Int.self, forKey: .maximum)
@@ -54,7 +53,18 @@ public struct Items: Decodable {
         let multipleOf = try container.decodeIfPresent(Int.self, forKey: .multipleOf)
         let required = try container.decodeIfPresent([String].self, forKey: .required)
 
-        switch typeString {
+        var typeString = try container.decodeIfPresent(String.self, forKey: .type)
+        if typeString == nil {
+            if container.contains(.properties) {
+                typeString = "object"
+            } else {
+                throw SwaggerError.failedToParse
+            }
+        }
+
+        guard let type = typeString else { fatalError("Failed to find type on schema") }
+
+        switch type {
         case "array":
             let collectionFormat = (try container.decodeIfPresent(CollectionFormat.self, forKey: .collectionFormat)) ?? .csv
             let items = try container.decode(Items.self, forKey: .items)
