@@ -85,9 +85,9 @@ public struct Schema: Decodable {
             }
         }
 
-        guard typeString != nil else { fatalError("Failed to find type on schema") }
+        guard let type = typeString else { fatalError("Failed to find type on schema") }
 
-        switch typeString! {
+        switch type {
         case "object":
             let isDictionary = container.contains(.additionalProperties)
 
@@ -113,7 +113,10 @@ public struct Schema: Decodable {
                 }
             } else {
                 let allOf = try container.decodeIfPresent([NodeWrapper<Schema>].self, forKey: .allOf).map { $0.map { $0.value } }
-                let properties = try container.decodeIfPresent([String: NodeWrapper<Schema>].self, forKey: .properties)?.compactMapValues { $0.value }
+
+                let properties = try container.decodeIfPresent([String: NodeWrapper<Schema>].self, forKey: .properties)?
+                    .compactMapValues { $0.value }
+
                 self.type = .object(properties: properties ?? [:], allOf: allOf)
             }
         case "string":

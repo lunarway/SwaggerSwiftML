@@ -39,4 +39,8 @@ class ArraySchemaTests: XCTestCase {
             XCTAssert(false)
         }
     }
+
+    func testParseComplexObjectWithArrayArrayProperty() {
+        _ = load_schema(path: "Schemas/complex_object_with_array_property")
+    }
 }
