@@ -12,4 +12,12 @@ final class OperationTests: XCTestCase {
 
         XCTAssertEqual(operation.customFields["x-internal"], "true")
     }
+
+    func testSupportsEmptyResponse() {
+        let basicFileUrl = Bundle.module.url(forResource: "Operation/empty_response", withExtension: "yaml")
+
+        let fileContents = try! String(contentsOf: basicFileUrl!, encoding: .utf8)
+
+        try! YAMLDecoder().decode(Operation.self, from: fileContents)
+    }
 }

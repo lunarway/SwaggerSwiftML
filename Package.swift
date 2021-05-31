@@ -30,6 +30,7 @@ let package = Package(
                 .copy("Items"),
                 .copy("swag.yaml"),
                 .copy("Operation"),
+                .copy("Response"),
             ]),
     ]
 )
