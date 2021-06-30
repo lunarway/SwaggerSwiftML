@@ -66,6 +66,9 @@ public struct Items: Decodable {
         let multipleOf = try container.decodeIfPresent(Int.self, forKey: .multipleOf)
         let required = try container.decodeIfPresent([String].self, forKey: .required)
 
+        let unknownKeysContainer = try decoder.container(keyedBy: RawCodingKeys.self)
+        let keys = unknownKeysContainer.allKeys.filter { $0.stringValue.starts(with: "x-", by: { $0 == $1  }) }
+
         var customFields = [String: String]()
         keys.map { ($0.stringValue, try? unknownKeysContainer.decode(String.self, forKey: $0)) }
             .forEach { key, value in customFields[key] = value }
