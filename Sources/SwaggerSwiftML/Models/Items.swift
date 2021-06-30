@@ -9,6 +9,7 @@ public indirect enum ItemsType {
 
 public struct Items: Decodable {
     public let type: ItemsType
+    public let customFields: [String: String]
 
     enum CodingKeys: String, CodingKey {
         case type
@@ -34,6 +35,18 @@ public struct Items: Decodable {
         case required
     }
 
+    private struct CustomCodingKeys: CodingKey {
+        var intValue: Int?
+        var stringValue: String
+
+        init?(intValue: Int) { self.intValue = intValue; self.stringValue = "\(intValue)" }
+        init?(stringValue: String) { self.stringValue = stringValue }
+
+        static func make(key: String) -> CodingKeys {
+            return CodingKeys(stringValue: key)!
+        }
+    }
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
@@ -52,6 +65,11 @@ public struct Items: Decodable {
         let enumeration = try container.decodeIfPresent([String].self, forKey: .enumeration)
         let multipleOf = try container.decodeIfPresent(Int.self, forKey: .multipleOf)
         let required = try container.decodeIfPresent([String].self, forKey: .required)
+
+        var customFields = [String: String]()
+        keys.map { ($0.stringValue, try? unknownKeysContainer.decode(String.self, forKey: $0)) }
+            .forEach { key, value in customFields[key] = value }
+        self.customFields = customFields
 
         var typeString = try container.decodeIfPresent(String.self, forKey: .type)
         if typeString == nil {
