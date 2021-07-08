@@ -10,4 +10,15 @@ final class ResponseTests: XCTestCase {
 
         try! YAMLDecoder().decode([String: Response].self, from: fileContents)
     }
+
+    func testResponseWithHeader() {
+        let basicFileUrl = Bundle.module.url(forResource: "Response/response_with_header", withExtension: "yaml")
+
+        let fileContents = try! String(contentsOf: basicFileUrl!, encoding: .utf8)
+
+        let result = try! YAMLDecoder().decode(Response.self, from: fileContents)
+
+        let headers = result.headers
+        XCTAssertNotNil(headers)
+    }
 }
