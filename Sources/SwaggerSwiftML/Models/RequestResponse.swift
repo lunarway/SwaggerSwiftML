@@ -6,5 +6,5 @@ public struct RequestResponse: Decodable {
     /// response. As an extension to the Schema Object, its root type value may also be "file". This SHOULD be accompanied by a relevant produces mime-type.
     public let schema: NodeWrapper<Schema>?
     // A list of headers that are sent with the response.
-    public let headers: [String: Header]?
+    public let headers: [String: HeaderObject]?
 }
