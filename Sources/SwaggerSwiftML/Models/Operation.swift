@@ -19,7 +19,7 @@ public struct Operation: Decodable {
     /// A list of parameters that are applicable for this operation. If a parameter is already defined at the Path Item, the new definition will override it, but can never remove it. The list MUST NOT include duplicated parameters. A unique parameter is defined by a combination of a name and location. The list can use the Reference Object to link to parameters that are defined at the Swagger Object's parameters. There can be one "body" parameter at most.
     public let parameters: [Node<Parameter>]?
     /// The list of possible responses as they are returned from executing this operation.
-    public let responses: [Int: Node<RequestResponse>?]
+    public let responses: [Int: Node<Response>?]
     /// The transfer protocol for the operation. Values MUST be from the list: "http", "https", "ws", "wss". The value overrides the Swagger Object schemes definition.
     public let schemes: [Scheme]?
     /// Declares this operation to be deprecated. Usage of the declared operation should be refrained. Default value is false.
@@ -52,7 +52,7 @@ public struct Operation: Decodable {
         self.operationId = try con.decodeIfPresent(String.self, forKey: .operationId)
         self.consumes = try con.decodeIfPresent([String].self, forKey: .consumes)
         self.produces = try con.decodeIfPresent([String].self, forKey: .produces)
-        self.responses = try con.decode([Int: Node<RequestResponse>?].self, forKey: .responses)
+        self.responses = try con.decode([Int: Node<Response>?].self, forKey: .responses)
 
         if con.contains(.parameters) {
             var params = [Node<Parameter>]()
