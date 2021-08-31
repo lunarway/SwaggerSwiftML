@@ -6,6 +6,7 @@ public indirect enum SchemaType {
     case boolean
     case array(Node<Items>, collectionFormat: CollectionFormat, maxItems: Int?, minItems: Int?, uniqueItems: Bool)
     case object(properties: [String: Node<Schema>], allOf: [Node<Schema>]?)
+    case file
 
     // The schema represents a dictionary type, i.e. a [String: <something>]
     // - valueType: the value type of the dictionary, i.e. the `something`

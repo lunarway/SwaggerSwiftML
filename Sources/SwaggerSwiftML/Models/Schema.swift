@@ -145,6 +145,8 @@ public struct Schema: Decodable {
                                maxItems: maxItems,
                                minItems: minItems,
                                uniqueItems: uniqueItems)
+        case "file":
+            self.type = .file
         default:
             throw SchemaParseError.invalidType("Unsupported type: \(typeString!) found on a schema")
         }
