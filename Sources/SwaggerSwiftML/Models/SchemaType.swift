@@ -5,7 +5,9 @@ public indirect enum SchemaType {
     case integer(format: DataFormat?, maximum: Int?, exclusiveMaximum: Bool?, minimum: Int?, exclusiveMinimum: Bool?, multipleOf: Int?)
     case boolean
     case array(Node<Items>, collectionFormat: CollectionFormat, maxItems: Int?, minItems: Int?, uniqueItems: Bool)
-    case object(properties: [String: Node<Schema>], allOf: [Node<Schema>]?)
+    // Complex object type
+    // - Parameter properties: the list of properties (or fields) that are present on types. This can be nil if the object is free-form (see https://swagger.io/docs/specification/data-models/data-types/#object)
+    case object(properties: [String: Node<Schema>]?, allOf: [Node<Schema>]?)
     case file
 
     // The schema represents a dictionary type, i.e. a [String: <something>]

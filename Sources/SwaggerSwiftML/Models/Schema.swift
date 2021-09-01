@@ -117,7 +117,7 @@ public struct Schema: Decodable {
                 let properties = try container.decodeIfPresent([String: NodeWrapper<Schema>].self, forKey: .properties)?
                     .compactMapValues { $0.value }
 
-                self.type = .object(properties: properties ?? [:], allOf: allOf)
+                self.type = .object(properties: properties, allOf: allOf)
             }
         case "string":
             self.type = .string(format: format, enumValues: enumeration, maxLength: maxLength, minLength: minLength, pattern: pattern)

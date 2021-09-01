@@ -18,6 +18,6 @@ final class OperationTests: XCTestCase {
 
         let fileContents = try! String(contentsOf: basicFileUrl!, encoding: .utf8)
 
-        try! YAMLDecoder().decode(Operation.self, from: fileContents)
+        _ = try! YAMLDecoder().decode(Operation.self, from: fileContents)
     }
 }
