@@ -40,7 +40,7 @@ class DictionarySchemaTests: XCTestCase {
 
         if case let SchemaType.dictionary(_, requiredKeys) = schema.type {
             XCTAssertEqual(requiredKeys.count, 1)
-            if (requiredKeys.count == 0) {
+            if requiredKeys.count == 0 {
                 XCTAssert(false, "Failed to find any required keys")
                 return
             }
@@ -49,32 +49,6 @@ class DictionarySchemaTests: XCTestCase {
             XCTAssertEqual(key.name, "default")
             XCTAssertNotNil(key.type)
             XCTAssertTrue(key.required)
-        } else { XCTAssert(false) }
-    }
-
-    func testParseFreeformBooleanDictionary() {
-        let schema = load_schema(path: "Schemas/Dictionary/dict_freeform_boolean")
-
-        // verify that the value type is a string
-        if case let SchemaType.dictionary(valueType: valueType, _) = schema.type {
-            if case DictionaryValueType.any = valueType {
-                XCTAssert(true)
-            } else {
-                XCTAssert(false)
-            }
-        } else { XCTAssert(false) }
-    }
-
-    func testParseFreeformEmptyObjectDictionary() {
-        let schema = load_schema(path: "Schemas/Dictionary/dict_freeform_empty_object")
-
-        // verify that the value type is a string
-        if case let SchemaType.dictionary(valueType: valueType, _) = schema.type {
-            if case DictionaryValueType.any = valueType {
-                XCTAssert(true)
-            } else {
-                XCTAssert(false)
-            }
         } else { XCTAssert(false) }
     }
 

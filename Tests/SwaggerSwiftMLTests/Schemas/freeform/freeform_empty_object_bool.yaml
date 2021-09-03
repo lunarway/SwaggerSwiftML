@@ -1,3 +1,2 @@
-# [String: Any]
 type: object
 additionalProperties: true

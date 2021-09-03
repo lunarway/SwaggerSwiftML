@@ -73,7 +73,7 @@ public struct Schema: Decodable {
 
         var customFields = [String: String]()
         keys.map { ($0.stringValue, try? unknownKeysContainer.decode(String.self, forKey: $0)) }
-            .forEach { key, value in customFields[key] = value }
+        .forEach { key, value in customFields[key] = value }
         self.customFields = customFields
 
         var typeString = try container.decodeIfPresent(String.self, forKey: .type)
@@ -89,17 +89,50 @@ public struct Schema: Decodable {
 
         switch type {
         case "object":
-            let isDictionary = container.contains(.additionalProperties)
+            // A dictionary in swagger is always String indexed, and is defined by having the additionalProperties field.
+            // The additional properties field must have a child defining the value type of the dictionary.
+            // See https://swagger.io/docs/specification/data-models/dictionaries/
+
+            var isFreeFormObject = false
+            var isDictionary = false
+            if container.contains(.additionalProperties) {
+                // if .additionalProperties is defined and set to true then this is a freeform object
+                if let boolValue = try? container.decode(Bool.self, forKey: .additionalProperties), boolValue == true {
+                    isFreeFormObject = true
+                }
+
+                if let additionalPropertiesContainer = try? container.nestedContainer(keyedBy: CustomCodingKeys.self, forKey: .additionalProperties) {
+                    let count = additionalPropertiesContainer.allKeys.count
+
+                    // if .additionalProperties is defined but it has no children then it means that this is a free
+                    // form object, if it should have been a dictionary the value type would have to be defined
+                    // under .additionalProperties
+                    if count == 0 {
+                        isFreeFormObject = true
+                    } else if count > 0 {
+                        isDictionary = true
+                    }
+                }
+            }
+
+            if let unkeyed = try? decoder.container(keyedBy: CustomCodingKeys.self) {
+                if unkeyed.allKeys.count == 1 && unkeyed.allKeys.contains(where: { $0.stringValue == "type" }) {
+                    isFreeFormObject = true
+                } else if unkeyed.allKeys.count == 0 {
+                    isFreeFormObject = true
+                }
+            }
+
+            if isFreeFormObject {
+                self.type = .dictionary(valueType: .any, keys: [])
+                return
+            }
 
             if isDictionary {
                 let properties = (try? container.decodeIfPresent([String: Schema].self, forKey: .properties)) ?? [:]
                 let required = (try container.decodeIfPresent([String].self, forKey: .required)) ?? []
 
-                let keys = properties.map { prop in
-                    KeyType(name: prop.key,
-                            type: prop.value,
-                            required: required.contains(prop.key))
-                }
+                let keys = properties.map { KeyType(name: $0.key, type: $0.value, required: required.contains($0.key)) }
 
                 if let reference = try? container.decodeIfPresent(Reference.self, forKey: .additionalProperties) {
                     self.type = .dictionary(valueType: .reference(reference.ref), keys: keys)
@@ -112,12 +145,16 @@ public struct Schema: Decodable {
                     self.type = .dictionary(valueType: .any, keys: keys)
                 }
             } else {
-                let allOf = try container.decodeIfPresent([NodeWrapper<Schema>].self, forKey: .allOf).map { $0.map { $0.value } }
+                if isFreeFormObject {
+                    self.type = .freeform
+                } else {
+                    let allOf = try container.decodeIfPresent([NodeWrapper<Schema>].self, forKey: .allOf).map { $0.map { $0.value } }
 
-                let properties = try container.decodeIfPresent([String: NodeWrapper<Schema>].self, forKey: .properties)?
-                    .compactMapValues { $0.value }
+                    let properties = try container.decodeIfPresent([String: NodeWrapper<Schema>].self, forKey: .properties)?
+                        .compactMapValues { $0.value }
 
-                self.type = .object(properties: properties, allOf: allOf)
+                    self.type = .object(properties: properties ?? [:], allOf: allOf)
+                }
             }
         case "string":
             self.type = .string(format: format, enumValues: enumeration, maxLength: maxLength, minLength: minLength, pattern: pattern)
