@@ -4,7 +4,7 @@
 public enum DataFormat: Decodable {
     // type: integer - format: int32 - comment: signed 32 bits
     case int32
-    
+
     case long
     case float
     case double

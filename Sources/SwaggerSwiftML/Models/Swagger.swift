@@ -24,7 +24,7 @@ public struct Swagger: Decodable {
     public let responses: [String: Response]?
     /// Security scheme definitions that can be used across the specification.
     public let securityDefinitions: [String: SecurityDefinition]?
-    ///b A declaration of which security schemes are applied for the API as a whole. The list of values describes alternative security schemes that can be used (that is, there is a logical OR between the security requirements). Individual operations can override this definition.
+    /// A declaration of which security schemes are applied for the API as a whole. The list of values describes alternative security schemes that can be used (that is, there is a logical OR between the security requirements). Individual operations can override this definition.
     public let security: [String: SecurityRequirement]?
     /// A list of tags used by the specification with additional metadata. The order of the tags can be used to reflect on their order by the parsing tools. Not all tags that are used by the Operation Object must be declared. The tags that are not declared may be organized randomly or based on the tools' logic. Each tag name in the list MUST be unique.
     public let tags: [Tag]?

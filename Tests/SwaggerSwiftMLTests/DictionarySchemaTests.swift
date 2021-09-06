@@ -40,7 +40,7 @@ class DictionarySchemaTests: XCTestCase {
 
         if case let SchemaType.dictionary(_, requiredKeys) = schema.type {
             XCTAssertEqual(requiredKeys.count, 1)
-            if (requiredKeys.count == 0) {
+            if requiredKeys.count == 0 {
                 XCTAssert(false, "Failed to find any required keys")
                 return
             }
@@ -52,32 +52,6 @@ class DictionarySchemaTests: XCTestCase {
         } else { XCTAssert(false) }
     }
 
-    func testParseFreeformBooleanDictionary() {
-        let schema = load_schema(path: "Schemas/Dictionary/dict_freeform_boolean")
-
-        // verify that the value type is a string
-        if case let SchemaType.dictionary(valueType: valueType, _) = schema.type {
-            if case DictionaryValueType.any = valueType {
-                XCTAssert(true)
-            } else {
-                XCTAssert(false)
-            }
-        } else { XCTAssert(false) }
-    }
-
-    func testParseFreeformEmptyObjectDictionary() {
-        let schema = load_schema(path: "Schemas/Dictionary/dict_freeform_empty_object")
-
-        // verify that the value type is a string
-        if case let SchemaType.dictionary(valueType: valueType, _) = schema.type {
-            if case DictionaryValueType.any = valueType {
-                XCTAssert(true)
-            } else {
-                XCTAssert(false)
-            }
-        } else { XCTAssert(false) }
-    }
-
     func testParseValueIsInlineObjectDictionary() {
         let schema = load_schema(path: "Schemas/Dictionary/dict_value_is_inline_schema")
 
@@ -85,13 +59,13 @@ class DictionarySchemaTests: XCTestCase {
         if case let SchemaType.dictionary(valueType: valueType, _) = schema.type {
             if case let DictionaryValueType.schema(schema) = valueType {
                 if case let SchemaType.object(properties: props, _) = schema.type {
-                    let codeProp = props!["code"]!.unwrapped!
+                    let codeProp = props["code"]!.unwrapped!
 
                     if case SchemaType.integer = codeProp.type {
                         XCTAssert(true)
                     } else { XCTAssert(false) }
 
-                    let textProp = props!["text"]!.unwrapped!
+                    let textProp = props["text"]!.unwrapped!
 
                     if case SchemaType.string = textProp.type {
                         XCTAssert(true)
