@@ -30,7 +30,7 @@ class SchemaTests: XCTestCase {
         switch schema.type {
         case .object(let properties, _):
             XCTAssertTrue(true)
-            let nameProperty = properties!["name"]!
+            let nameProperty = properties["name"]!
             XCTAssertNotNil(nameProperty)
             switch nameProperty {
             case .reference:
@@ -48,7 +48,7 @@ class SchemaTests: XCTestCase {
                 }
             }
 
-            let addressProperty = properties!["address"]!
+            let addressProperty = properties["address"]!
             XCTAssertNotNil(addressProperty)
             switch addressProperty {
             case .reference(let ref):
@@ -57,7 +57,7 @@ class SchemaTests: XCTestCase {
                 XCTAssert(false)
             }
 
-            let ageProperty = properties!["age"]!
+            let ageProperty = properties["age"]!
             XCTAssertNotNil(ageProperty)
             switch ageProperty {
             case .reference:
@@ -102,7 +102,7 @@ class SchemaTests: XCTestCase {
         let schema = try! YAMLDecoder().decode(Schema.self, from: fileContents)
 
         if case let SchemaType.object(properties: properties, _) = schema.type {
-            XCTAssertEqual(2, properties!.count)
+            XCTAssertEqual(2, properties.count)
         } else {
             XCTAssert(false, "Wrong type on definition")
         }
@@ -116,7 +116,7 @@ class SchemaTests: XCTestCase {
         let schema = try! YAMLDecoder().decode(Schema.self, from: fileContents)
 
         if case let SchemaType.object(properties: properties, _) = schema.type {
-            XCTAssertEqual(4, properties!.count)
+            XCTAssertEqual(4, properties.count)
         } else {
             XCTAssert(false, "Wrong type on definition")
         }
@@ -154,7 +154,7 @@ class SchemaTests: XCTestCase {
 
         guard case let SchemaType.object(properties: properties, allOf) = schema.type else { XCTAssert(false); return }
 
-        XCTAssertNil(properties)
+        XCTAssert(properties.isEmpty)
         XCTAssertEqual(allOf?.count, 2)
     }
 }

@@ -123,11 +123,6 @@ public struct Schema: Decodable {
                 }
             }
 
-            if isFreeFormObject {
-                self.type = .dictionary(valueType: .any, keys: [])
-                return
-            }
-
             if isDictionary {
                 let properties = (try? container.decodeIfPresent([String: Schema].self, forKey: .properties)) ?? [:]
                 let required = (try container.decodeIfPresent([String].self, forKey: .required)) ?? []
