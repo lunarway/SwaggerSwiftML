@@ -33,6 +33,7 @@ public struct Schema: Decodable {
         case properties
         case additionalProperties
         case collectionFormat
+        case defaultValue = "default"
     }
 
     private struct CustomCodingKeys: CodingKey {
@@ -158,7 +159,8 @@ public struct Schema: Decodable {
         case "integer":
             self.type = .integer(format: format, maximum: maximum, exclusiveMaximum: exclusiveMaximum, minimum: minimum, exclusiveMinimum: excluesiveMinimum, multipleOf: multipleOf)
         case "boolean":
-            self.type = .boolean
+            let defaultValue = try container.decodeIfPresent(Bool.self, forKey: .defaultValue)
+            self.type = .boolean(defaultValue: defaultValue)
         case "array":
             let uniqueItems = (try container.decodeIfPresent(Bool.self, forKey: .uniqueItems) ?? false)
             let collectionFormat = (try container.decodeIfPresent(CollectionFormat.self, forKey: .collectionFormat)) ?? .csv
