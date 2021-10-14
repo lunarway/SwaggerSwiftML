@@ -79,7 +79,7 @@ public struct Schema: Decodable {
 
         var typeString = try container.decodeIfPresent(String.self, forKey: .type)
         if typeString == nil {
-            if container.contains(.properties) {
+            if container.contains(.properties) || container.contains(.allOf) {
                 typeString = "object"
             } else {
                 throw SwaggerError.failedToParse
