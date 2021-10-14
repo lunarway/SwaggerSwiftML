@@ -3,7 +3,7 @@ public struct NodeWrapper<T: Decodable> {
 }
 
 extension NodeWrapper: Decodable {
-    public init (from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
 
         if let ref = try? container.decode(Reference.self) {
