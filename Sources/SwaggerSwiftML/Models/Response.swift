@@ -14,6 +14,12 @@ public struct Response: Decodable {
         case headers
     }
 
+	public init(schema: Schema) {
+		self.schema = Node.node(schema)
+		self.description = nil
+		self.headers = nil
+	}
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.description = try container.decodeIfPresent(String.self, forKey: .description)
