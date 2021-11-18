@@ -166,10 +166,10 @@ public struct Schema: Decodable {
             let collectionFormat = (try container.decodeIfPresent(CollectionFormat.self, forKey: .collectionFormat)) ?? .csv
 
             let node: Node<Items>
-            if let itemsObject = try? container.decode(Items.self, forKey: .items) {
-                node = .node(itemsObject)
-            } else if let ref = try? container.decode(Reference.self, forKey: .items) {
+            if let ref = try? container.decode(Reference.self, forKey: .items) {
                 node = .reference(ref.ref)
+            } else if let itemsObject = try? container.decode(Items.self, forKey: .items) {
+                node = .node(itemsObject)
             } else {
                 throw SwaggerError.corruptFile
             }

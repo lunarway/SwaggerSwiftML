@@ -98,7 +98,9 @@ public struct Items: Decodable {
             let properties = try container.decodeIfPresent([String: NodeWrapper<Schema>].self,
                                                            forKey: .properties)?.compactMapValues { $0.value }
 
-            self.type = .object(required: required ?? [], properties: properties ?? [:], allOf: allOf)
+            self.type = .object(required: required ?? [],
+                                properties: properties ?? [:],
+                                allOf: allOf)
         default:
             throw SwaggerParseError.invalidField(typeString ?? "No field found on Items")
         }
