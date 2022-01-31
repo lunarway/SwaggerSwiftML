@@ -94,37 +94,40 @@ public struct Schema: Decodable {
             // The additional properties field must have a child defining the value type of the dictionary.
             // See https://swagger.io/docs/specification/data-models/dictionaries/
 
-            var isFreeFormObject = false
-            var isDictionary = false
+            var objectType: ObjectType = .normal
             if container.contains(.additionalProperties) {
                 // if .additionalProperties is defined and set to true then this is a freeform object
                 if let boolValue = try? container.decode(Bool.self, forKey: .additionalProperties), boolValue == true {
-                    isFreeFormObject = true
-                }
-
-                if let additionalPropertiesContainer = try? container.nestedContainer(keyedBy: CustomCodingKeys.self, forKey: .additionalProperties) {
+                    objectType = .freeform
+                } else if let additionalPropertiesContainer = try? container.nestedContainer(keyedBy: CustomCodingKeys.self, forKey: .additionalProperties) {
                     let count = additionalPropertiesContainer.allKeys.count
 
                     // if .additionalProperties is defined but it has no children then it means that this is a free
                     // form object, if it should have been a dictionary the value type would have to be defined
                     // under .additionalProperties
                     if count == 0 {
-                        isFreeFormObject = true
+                        objectType = .freeform
+                    } else if count == 1,
+                              let embeddedType = try? additionalPropertiesContainer.decodeIfPresent(String.self, forKey: CustomCodingKeys.init(stringValue: "type")!), embeddedType == "object" {
+                        objectType = .freeform
                     } else if count > 0 {
-                        isDictionary = true
+                        objectType = .dictionary
                     }
                 }
             }
 
             if let unkeyed = try? decoder.container(keyedBy: CustomCodingKeys.self) {
                 if unkeyed.allKeys.count == 1 && unkeyed.allKeys.contains(where: { $0.stringValue == "type" }) {
-                    isFreeFormObject = true
+                    objectType = .freeform
                 } else if unkeyed.allKeys.count == 0 {
-                    isFreeFormObject = true
+                    objectType = .freeform
                 }
             }
 
-            if isDictionary {
+            switch objectType {
+            case .freeform:
+                self.type = .freeform
+            case .dictionary:
                 let properties = (try? container.decodeIfPresent([String: Schema].self, forKey: .properties)) ?? [:]
                 let required = (try container.decodeIfPresent([String].self, forKey: .required)) ?? []
 
@@ -140,17 +143,13 @@ public struct Schema: Decodable {
                 } else {
                     self.type = .dictionary(valueType: .any, keys: keys)
                 }
-            } else {
-                if isFreeFormObject {
-                    self.type = .freeform
-                } else {
-                    let allOf = try container.decodeIfPresent([NodeWrapper<Schema>].self, forKey: .allOf).map { $0.map { $0.value } }
+            case .normal:
+                let allOf = try container.decodeIfPresent([NodeWrapper<Schema>].self, forKey: .allOf).map { $0.map { $0.value } }
 
-                    let properties = try container.decodeIfPresent([String: NodeWrapper<Schema>].self, forKey: .properties)?
-                        .compactMapValues { $0.value }
+                let properties = try container.decodeIfPresent([String: NodeWrapper<Schema>].self, forKey: .properties)?
+                    .compactMapValues { $0.value }
 
-                    self.type = .object(properties: properties ?? [:], allOf: allOf)
-                }
+                self.type = .object(properties: properties ?? [:], allOf: allOf)
             }
         case "string":
             self.type = .string(format: format, enumValues: enumeration, maxLength: maxLength, minLength: minLength, pattern: pattern)
@@ -189,4 +188,10 @@ public struct Schema: Decodable {
 
 enum SchemaParseError: Error {
     case invalidType(String)
+}
+
+enum ObjectType {
+    case freeform
+    case dictionary
+    case normal
 }
