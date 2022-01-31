@@ -35,4 +35,12 @@ class FreeFormObjectTests: XCTestCase {
             XCTAssert(true)
         } else { XCTAssert(false) }
     }
+
+    func testParseFreeformEmptyObjectWithTypeObjectInAdditionalProperties() {
+        let schema = load_schema(path: "Schemas/freeform/freeform_additional_type_object")
+
+        if case SchemaType.freeform = schema.type {
+            XCTAssert(true)
+        } else { XCTAssert(false) }
+    }
 }
