@@ -67,7 +67,7 @@ public struct Items: Decodable {
             if container.contains(.properties) || container.contains(.allOf) {
                 typeString = "object"
             } else {
-                throw SwaggerError.failedToParse
+                throw SwaggerError.failedToParse(description: "", codingPath: container.codingPath)
             }
         }
 

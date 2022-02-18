@@ -2,16 +2,23 @@ public struct NodeWrapper<T: Decodable> {
     public let value: Node<T>
 }
 
+public enum NodeWrapperError: Error {
+    case invalidType(Error)
+}
+
 extension NodeWrapper: Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
 
         if let ref = try? container.decode(Reference.self) {
-            value = .reference(ref.ref)
-        } else if let prop = try? container.decode(T.self) {
-            value = .node(prop)
+            self.value = .reference(ref.ref)
         } else {
-            fatalError("Failed to parse: \(container)")
+            do {
+                let result = try container.decode(T.self)
+                self.value = .node(result)
+            } catch let error {
+                throw NodeWrapperError.invalidType(error)
+            }
         }
     }
 }
