@@ -157,4 +157,16 @@ class SchemaTests: XCTestCase {
         XCTAssert(properties.isEmpty)
         XCTAssertEqual(allOf?.count, 2)
     }
+
+    func testCannotParseInvalidAnyOfObjects() {
+        let basicFileUrl = Bundle.module.url(forResource: "Schemas/allOf/invalid_allof", withExtension: "yaml")
+
+        let fileContents = try! String(contentsOf: basicFileUrl!, encoding: .utf8)
+
+        do {
+            _ = try YAMLDecoder().decode(Schema.self, from: fileContents)
+        } catch {
+            XCTAssertTrue(true)
+        }
+    }
 }

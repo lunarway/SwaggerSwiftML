@@ -1,11 +1,13 @@
-description: Plan description
+# This is invalid because both required and properties are seperate objects. The - in front of properties shouldnt be there.
+
+description: Object Description
 type: object
 allOf:
   - $ref: '#/definitions/BaseModel'
   - required:
       - id
       - updated
-    properties:
+  - properties:
       title:
         type: string
       objectReference:

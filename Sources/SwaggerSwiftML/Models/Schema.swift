@@ -82,7 +82,7 @@ public struct Schema: Decodable {
             if container.contains(.properties) || container.contains(.allOf) {
                 typeString = "object"
             } else {
-                throw SwaggerError.failedToParse
+                throw SwaggerError.failedToParse(description: "Failed to parse type without type information. The type has no properties or allOf defined and so it cant be an object. The object has these properties: \(container.allKeys.map { $0.rawValue }.joined(separator: ", "))", codingPath: container.codingPath)
             }
         }
 
@@ -144,7 +144,10 @@ public struct Schema: Decodable {
                     self.type = .dictionary(valueType: .any, keys: keys)
                 }
             case .normal:
-                let allOf = try container.decodeIfPresent([NodeWrapper<Schema>].self, forKey: .allOf).map { $0.map { $0.value } }
+                var allOf: [Node<Schema>] = []
+                if let allOfElements = try container.decodeIfPresent([NodeWrapper<Schema>].self, forKey: .allOf) {
+                        allOf = allOfElements.map { $0.value }
+                    }
 
                 let properties = try container.decodeIfPresent([String: NodeWrapper<Schema>].self, forKey: .properties)?
                     .compactMapValues { $0.value }

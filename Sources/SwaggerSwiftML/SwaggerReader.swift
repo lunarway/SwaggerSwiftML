@@ -5,7 +5,7 @@ public enum SwaggerError: Error {
     case fileNotFound
     case corruptFile
     case invalidPath
-    case failedToParse
+    case failedToParse(description: String, codingPath: [CodingKey])
 }
 
 public enum FileFormat {
