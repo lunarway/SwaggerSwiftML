@@ -15,8 +15,10 @@ public struct Swagger: Decodable {
     /// A list of MIME types the APIs can produce. This is global to all APIs but can be overridden on specific API calls. Value MUST be as described under Mime Types.
     public let produces: [String]?
     /// Holds the relative paths to the individual endpoints. The path is appended to the basePath in order to construct the full URL. The Paths may be empty, due to ACL constraints.
+    /// Maps: ServicePath to Path, e.g. '/ping' -> PingResponse
     public let paths: [String: Path]
     /// An object to hold data types produced and consumed by operations.
+    /// Maps model name to schema definition
     public let definitions: [String: Schema]?
     /// An object to hold parameters that can be used across operations. This property does not define global parameters for all operations.
     public let parameters: [String: Parameter]?
