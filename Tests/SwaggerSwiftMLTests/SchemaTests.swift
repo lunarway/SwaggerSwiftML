@@ -12,7 +12,7 @@ class SchemaTests: XCTestCase {
         let schema = try! YAMLDecoder().decode(Schema.self, from: fileContents)
 
         switch schema.type {
-        case .string(let format, enumValues: _, maxLength: _, minLength: _, pattern: _):
+        case .string(let format, _, _, _, _, _):
             XCTAssertNotNil(format)
             XCTAssertEqual(format!, .email)
         default:
@@ -37,7 +37,7 @@ class SchemaTests: XCTestCase {
                 XCTAssert(false, "should not find a reference")
             case .node(let property):
                 switch property.type {
-                case .string(format: let format, enumValues: let enumValues, maxLength: let maxLength, minLength: let minLength, pattern: let pattern):
+                case .string(format: let format, enumValues: let enumValues, maxLength: let maxLength, minLength: let minLength, pattern: let pattern, _):
                     XCTAssertNil(format)
                     XCTAssertNil(enumValues)
                     XCTAssertNil(maxLength)
@@ -64,7 +64,7 @@ class SchemaTests: XCTestCase {
                 XCTAssert(false, "should not find a reference")
             case .node(let property):
                 switch property.type {
-                case .integer(format: let format, maximum: let maximum, exclusiveMaximum: let exclusiveMaximum, minimum: let minimum, exclusiveMinimum: let exclusiveMinimum, multipleOf: let multipleOf):
+                case .integer(format: let format, maximum: let maximum, exclusiveMaximum: let exclusiveMaximum, minimum: let minimum, exclusiveMinimum: let exclusiveMinimum, multipleOf: let multipleOf, _):
                     XCTAssertNotNil(format)
                     XCTAssertEqual(format!, .int32)
                     XCTAssertEqual(minimum!, 0)
