@@ -155,11 +155,14 @@ public struct Schema: Decodable {
                 self.type = .object(properties: properties ?? [:], allOf: allOf)
             }
         case "string":
-            self.type = .string(format: format, enumValues: enumeration, maxLength: maxLength, minLength: minLength, pattern: pattern)
+            let defaultValue = try container.decodeIfPresent(String.self, forKey: .defaultValue)
+            self.type = .string(format: format, enumValues: enumeration, maxLength: maxLength, minLength: minLength, pattern: pattern, defaultValue: defaultValue)
         case "number":
-            self.type = .number(format: format, maximum: maximum, exclusiveMaximum: exclusiveMaximum, minimum: minimum, exclusiveMinimum: excluesiveMinimum, multipleOf: multipleOf)
+            let defaultValue = try container.decodeIfPresent(Double.self, forKey: .defaultValue)
+            self.type = .number(format: format, maximum: maximum, exclusiveMaximum: exclusiveMaximum, minimum: minimum, exclusiveMinimum: excluesiveMinimum, multipleOf: multipleOf, defaultValue: defaultValue)
         case "integer":
-            self.type = .integer(format: format, maximum: maximum, exclusiveMaximum: exclusiveMaximum, minimum: minimum, exclusiveMinimum: excluesiveMinimum, multipleOf: multipleOf)
+            let defaultValue = try container.decodeIfPresent(Int.self, forKey: .defaultValue)
+            self.type = .integer(format: format, maximum: maximum, exclusiveMaximum: exclusiveMaximum, minimum: minimum, exclusiveMinimum: excluesiveMinimum, multipleOf: multipleOf, defaultValue: defaultValue)
         case "boolean":
             let defaultValue = try container.decodeIfPresent(Bool.self, forKey: .defaultValue)
             self.type = .boolean(defaultValue: defaultValue)
