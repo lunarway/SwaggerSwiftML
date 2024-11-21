@@ -63,7 +63,7 @@ public struct Operation: Decodable {
                 } else if let parameter = try? parameterContainer.decode(Parameter.self) {
                     params.append(.node(parameter))
                 } else {
-                    fatalError("Unknown object")
+                    throw UnknownObject()
                 }
             }
             self.parameters = params
@@ -84,3 +84,5 @@ public struct Operation: Decodable {
 //        self.security = try con.decodeIfPresent(SecurityRequirement.self, forKey: .security)
     }
 }
+
+struct UnknownObject: Error { }

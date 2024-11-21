@@ -62,4 +62,14 @@ final class ParameterTests: XCTestCase {
 
         //        XCTAssertEqual(parameter.location, .body)
     }
+
+    func testArrayWithRef() {
+        let basicFileUrl = Bundle.module.url(forResource: "Parameter/array_with_ref", withExtension: "yaml")
+
+        let fileContents = try! String(contentsOf: basicFileUrl!, encoding: .utf8)
+
+        _ = try! YAMLDecoder().decode(Parameter.self, from: fileContents)
+
+        //        XCTAssertEqual(parameter.location, .body)
+    }
 }

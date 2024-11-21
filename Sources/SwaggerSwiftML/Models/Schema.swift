@@ -81,6 +81,8 @@ public struct Schema: Decodable {
         if typeString == nil {
             if container.contains(.properties) || container.contains(.allOf) {
                 typeString = "object"
+            } else if container.contains(.items) {
+                typeString = "array"
             } else {
                 throw SwaggerError.failedToParse(description: "Failed to parse type without type information. The type has no properties or allOf defined and so it cant be an object. The object has these properties: \(container.allKeys.map { $0.rawValue }.joined(separator: ", "))", codingPath: container.codingPath)
             }

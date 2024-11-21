@@ -64,22 +64,57 @@ public struct Parameter: Decodable {
         case "array":
             let uniqueItems = try container.decodeIfPresent(Bool.self, forKey: .uniqueItems)
             let collectionFormat = (try container.decodeIfPresent(CollectionFormat.self, forKey: .collectionFormat)) ?? .csv
-            let items = try container.decode(Items.self, forKey: .items)
-            type = .array(items, collectionFormat: collectionFormat, maxItems: maxItems, minItems: minItems, uniqueItems: uniqueItems ?? false)
+
+            if let items = try? container.decode(Items.self, forKey: .items) {
+                type = .array(
+                    .node(items),
+                    collectionFormat: collectionFormat,
+                    maxItems: maxItems,
+                    minItems: minItems,
+                    uniqueItems: uniqueItems ?? false
+                )
+            } else if let reference = try? container.decode(Reference.self, forKey: .items) {
+                type = .array(
+                    .reference(reference.ref),
+                    collectionFormat: collectionFormat,
+                    maxItems: maxItems,
+                    minItems: minItems,
+                    uniqueItems: uniqueItems ?? false
+                )
+            } else {
+                throw InvalidArrayType()
+            }
+
         case "boolean":
             type = .boolean
         case "file":
             type = .file
         case "integer":
-            type = .integer(format: format, maximum: maximum, exclusiveMaximum: exclusiveMaximum, minimum: minimum, exclusiveMinimum: exclusiveMinimum, multipleOf: multipleOf)
+            type = .integer(
+                format: format,
+                maximum: maximum,
+                exclusiveMaximum: exclusiveMaximum,
+                minimum: minimum,
+                exclusiveMinimum: exclusiveMinimum,
+                multipleOf: multipleOf
+            )
         case "number":
-            type = .number(format: format, maximum: maximum, exclusiveMaximum: exclusiveMaximum, minimum: minimum, exclusiveMinimum: exclusiveMinimum, multipleOf: multipleOf)
+            type = .number(
+                format: format,
+                maximum: maximum,
+                exclusiveMaximum: exclusiveMaximum,
+                minimum: minimum,
+                exclusiveMinimum: exclusiveMinimum,
+                multipleOf: multipleOf
+            )
         case "string":
-            type = .string(format: format,
-                           enumValues: enumeration,
-                           maxLength: maxLength,
-                           minLength: minLength,
-                           pattern: pattern)
+            type = .string(
+                format: format,
+                enumValues: enumeration,
+                maxLength: maxLength,
+                minLength: minLength,
+                pattern: pattern
+            )
         default:
             type = nil
         }
@@ -107,3 +142,5 @@ public struct Parameter: Decodable {
         }
     }
 }
+
+struct InvalidArrayType: Error { }
