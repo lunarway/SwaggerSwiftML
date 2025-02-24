@@ -11,7 +11,7 @@ let package = Package(
             targets: ["SwaggerSwiftML"])
     ],
     dependencies: [
-        .package(url: "https://github.com/jpsim/Yams.git", from: "3.0.1")
+        .package(url: "https://github.com/jpsim/Yams.git", from: "5.3.1")
     ],
     targets: [
         .target(
