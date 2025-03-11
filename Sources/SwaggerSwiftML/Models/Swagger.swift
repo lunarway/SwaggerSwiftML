@@ -19,7 +19,7 @@ public struct Swagger: Decodable {
     public let paths: [String: Path]
     /// An object to hold data types produced and consumed by operations.
     /// Maps model name to schema definition
-    public let definitions: [String: Schema]?
+    public let definitions: [String: Node<Schema>]?
     /// An object to hold parameters that can be used across operations. This property does not define global parameters for all operations.
     public let parameters: [String: Parameter]?
     /// An object to hold responses that can be used across operations. This property does not define global responses for all operations.
@@ -65,7 +65,7 @@ public struct Swagger: Decodable {
         self.consumes = try container.decodeIfPresent([String].self, forKey: .consumes)
         self.produces = try container.decodeIfPresent([String].self, forKey: .produces)
         self.paths = try container.decode([String: Path].self, forKey: .paths)
-        self.definitions = try container.decodeIfPresent([String: Schema].self, forKey: .definitions)
+        self.definitions = try container.decodeIfPresent([String: Node<Schema>].self, forKey: .definitions)
         self.parameters = try container.decodeIfPresent([String: Parameter].self, forKey: .parameters)
         self.responses = try container.decodeIfPresent([String: Response].self, forKey: .responses)
         self.securityDefinitions = try container.decodeIfPresent(
