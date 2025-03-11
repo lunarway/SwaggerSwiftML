@@ -10,8 +10,8 @@ struct DefinitionTest {
               version: 1.0.0
               contact:
                 url: "https://swift.app/"
-            
-            paths:
+
+             paths:
                 /endpoint:
                     get:
                       responses:
@@ -23,7 +23,6 @@ struct DefinitionTest {
               Create:
                 type: object
                 $ref: '#/definitions/Stuff'
-            
               Stuff:
                 type: object
                 properties:
