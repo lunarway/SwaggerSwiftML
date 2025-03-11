@@ -58,4 +58,4 @@ public enum DataFormat: Decodable {
     }
 }
 
-extension DataFormat: Equatable { }
+extension DataFormat: Equatable {}

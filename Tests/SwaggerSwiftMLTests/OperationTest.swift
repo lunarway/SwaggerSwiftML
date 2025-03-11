@@ -1,10 +1,14 @@
 import XCTest
 import Yams
+
 @testable import SwaggerSwiftML
 
 final class OperationTests: XCTestCase {
     func testParseCustomFields() {
-        let basicFileUrl = Bundle.module.url(forResource: "Operation/customFields", withExtension: "yaml")
+        let basicFileUrl = Bundle.module.url(
+            forResource: "Operation/customFields",
+            withExtension: "yaml"
+        )
 
         let fileContents = try! String(contentsOf: basicFileUrl!, encoding: .utf8)
 
@@ -14,7 +18,10 @@ final class OperationTests: XCTestCase {
     }
 
     func testSupportsEmptyResponse() {
-        let basicFileUrl = Bundle.module.url(forResource: "Operation/empty_response", withExtension: "yaml")
+        let basicFileUrl = Bundle.module.url(
+            forResource: "Operation/empty_response",
+            withExtension: "yaml"
+        )
 
         let fileContents = try! String(contentsOf: basicFileUrl!, encoding: .utf8)
 

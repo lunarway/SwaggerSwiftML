@@ -1,5 +1,6 @@
 import XCTest
 import Yams
+
 @testable import SwaggerSwiftML
 
 final class ParameterTests: XCTestCase {
@@ -11,7 +12,10 @@ final class ParameterTests: XCTestCase {
     }
 
     func testParseArrayParameter() {
-        let basicFileUrl = Bundle.module.url(forResource: "Parameter/parameter_array", withExtension: "yaml")
+        let basicFileUrl = Bundle.module.url(
+            forResource: "Parameter/parameter_array",
+            withExtension: "yaml"
+        )
 
         let fileContents = try! String(contentsOf: basicFileUrl!, encoding: .utf8)
 
@@ -24,7 +28,10 @@ final class ParameterTests: XCTestCase {
     }
 
     func testRequiredDefaultsToFalse() {
-        let basicFileUrl = Bundle.module.url(forResource: "Parameter/not_defined_required", withExtension: "yaml")
+        let basicFileUrl = Bundle.module.url(
+            forResource: "Parameter/not_defined_required",
+            withExtension: "yaml"
+        )
 
         let fileContents = try! String(contentsOf: basicFileUrl!, encoding: .utf8)
 
@@ -34,17 +41,23 @@ final class ParameterTests: XCTestCase {
     }
 
     func testLoadSimpleStringType() {
-        let basicFileUrl = Bundle.module.url(forResource: "Parameter/string_parameter", withExtension: "yaml")
+        let basicFileUrl = Bundle.module.url(
+            forResource: "Parameter/string_parameter",
+            withExtension: "yaml"
+        )
 
         let fileContents = try! String(contentsOf: basicFileUrl!, encoding: .utf8)
 
         _ = try! YAMLDecoder().decode(Parameter.self, from: fileContents)
 
-//        XCTAssertEqual(parameter.type, .string)
+        //        XCTAssertEqual(parameter.type, .string)
     }
 
     func testBodyLocationHasSchema() {
-        let basicFileUrl = Bundle.module.url(forResource: "Parameter/parameter_array", withExtension: "yaml")
+        let basicFileUrl = Bundle.module.url(
+            forResource: "Parameter/parameter_array",
+            withExtension: "yaml"
+        )
 
         let fileContents = try! String(contentsOf: basicFileUrl!, encoding: .utf8)
 
@@ -54,7 +67,10 @@ final class ParameterTests: XCTestCase {
     }
 
     func testFormDataLocation() {
-        let basicFileUrl = Bundle.module.url(forResource: "Parameter/formdata_param", withExtension: "yaml")
+        let basicFileUrl = Bundle.module.url(
+            forResource: "Parameter/formdata_param",
+            withExtension: "yaml"
+        )
 
         let fileContents = try! String(contentsOf: basicFileUrl!, encoding: .utf8)
 
@@ -64,7 +80,10 @@ final class ParameterTests: XCTestCase {
     }
 
     func testArrayWithRef() {
-        let basicFileUrl = Bundle.module.url(forResource: "Parameter/array_with_ref", withExtension: "yaml")
+        let basicFileUrl = Bundle.module.url(
+            forResource: "Parameter/array_with_ref",
+            withExtension: "yaml"
+        )
 
         let fileContents = try! String(contentsOf: basicFileUrl!, encoding: .utf8)
 

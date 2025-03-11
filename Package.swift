@@ -8,7 +8,8 @@ let package = Package(
     products: [
         .library(
             name: "SwaggerSwiftML",
-            targets: ["SwaggerSwiftML"])
+            targets: ["SwaggerSwiftML"]
+        )
     ],
     dependencies: [
         .package(url: "https://github.com/jpsim/Yams.git", from: "3.0.1")
@@ -17,7 +18,8 @@ let package = Package(
         .target(
             name: "SwaggerSwiftML",
             dependencies: ["Yams"],
-            resources: nil),
+            resources: nil
+        ),
         .testTarget(
             name: "SwaggerSwiftMLTests",
             dependencies: ["SwaggerSwiftML"],
@@ -30,7 +32,8 @@ let package = Package(
                 .copy("Items"),
                 .copy("swag.yaml"),
                 .copy("Operation"),
-                .copy("Response")
-            ])
+                .copy("Response"),
+            ]
+        ),
     ]
 )

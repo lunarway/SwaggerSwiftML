@@ -40,7 +40,10 @@ public struct Schema: Decodable {
         var intValue: Int?
         var stringValue: String
 
-        init?(intValue: Int) { self.intValue = intValue; self.stringValue = "\(intValue)" }
+        init?(intValue: Int) {
+            self.intValue = intValue
+            self.stringValue = "\(intValue)"
+        }
         init?(stringValue: String) { self.stringValue = stringValue }
 
         static func make(key: String) -> CodingKeys {
@@ -70,11 +73,13 @@ public struct Schema: Decodable {
         let enumeration = try container.decodeIfPresent([String].self, forKey: .enumeration)
 
         let unknownKeysContainer = try decoder.container(keyedBy: RawCodingKeys.self)
-        let keys = unknownKeysContainer.allKeys.filter { $0.stringValue.starts(with: "x-", by: { $0 == $1  }) }
+        let keys = unknownKeysContainer.allKeys.filter {
+            $0.stringValue.starts(with: "x-", by: { $0 == $1 })
+        }
 
         var customFields = [String: String]()
         keys.map { ($0.stringValue, try? unknownKeysContainer.decode(String.self, forKey: $0)) }
-        .forEach { key, value in customFields[key] = value }
+            .forEach { key, value in customFields[key] = value }
         self.customFields = customFields
 
         var typeString = try container.decodeIfPresent(String.self, forKey: .type)
@@ -84,7 +89,11 @@ public struct Schema: Decodable {
             } else if container.contains(.items) {
                 typeString = "array"
             } else {
-                throw SwaggerError.failedToParse(description: "Failed to parse type without type information. The type has no properties or allOf defined and so it cant be an object. The object has these properties: \(container.allKeys.map { $0.rawValue }.joined(separator: ", "))", codingPath: container.codingPath)
+                throw SwaggerError.failedToParse(
+                    description:
+                        "Failed to parse type without type information. The type has no properties or allOf defined and so it cant be an object. The object has these properties: \(container.allKeys.map { $0.rawValue }.joined(separator: ", "))",
+                    codingPath: container.codingPath
+                )
             }
         }
 
@@ -99,9 +108,14 @@ public struct Schema: Decodable {
             var objectType: ObjectType = .normal
             if container.contains(.additionalProperties) {
                 // if .additionalProperties is defined and set to true then this is a freeform object
-                if let boolValue = try? container.decode(Bool.self, forKey: .additionalProperties), boolValue == true {
+                if let boolValue = try? container.decode(Bool.self, forKey: .additionalProperties),
+                    boolValue == true
+                {
                     objectType = .freeform
-                } else if let additionalPropertiesContainer = try? container.nestedContainer(keyedBy: CustomCodingKeys.self, forKey: .additionalProperties) {
+                } else if let additionalPropertiesContainer = try? container.nestedContainer(
+                    keyedBy: CustomCodingKeys.self,
+                    forKey: .additionalProperties
+                ) {
                     let count = additionalPropertiesContainer.allKeys.count
 
                     // if .additionalProperties is defined but it has no children then it means that this is a free
@@ -110,7 +124,12 @@ public struct Schema: Decodable {
                     if count == 0 {
                         objectType = .freeform
                     } else if count == 1,
-                              let embeddedType = try? additionalPropertiesContainer.decodeIfPresent(String.self, forKey: CustomCodingKeys.init(stringValue: "type")!), embeddedType == "object" {
+                        let embeddedType = try? additionalPropertiesContainer.decodeIfPresent(
+                            String.self,
+                            forKey: CustomCodingKeys.init(stringValue: "type")!
+                        ),
+                        embeddedType == "object"
+                    {
                         objectType = .freeform
                     } else if count > 0 {
                         objectType = .dictionary
@@ -119,7 +138,9 @@ public struct Schema: Decodable {
             }
 
             if let unkeyed = try? decoder.container(keyedBy: CustomCodingKeys.self) {
-                if unkeyed.allKeys.count == 1 && unkeyed.allKeys.contains(where: { $0.stringValue == "type" }) {
+                if unkeyed.allKeys.count == 1
+                    && unkeyed.allKeys.contains(where: { $0.stringValue == "type" })
+                {
                     objectType = .freeform
                 } else if unkeyed.allKeys.count == 0 {
                     objectType = .freeform
@@ -130,47 +151,91 @@ public struct Schema: Decodable {
             case .freeform:
                 self.type = .freeform
             case .dictionary:
-                let properties = (try? container.decodeIfPresent([String: Schema].self, forKey: .properties)) ?? [:]
+                let properties =
+                    (try? container.decodeIfPresent([String: Schema].self, forKey: .properties)) ?? [:]
                 let required = (try container.decodeIfPresent([String].self, forKey: .required)) ?? []
 
-                let keys = properties.map { KeyType(name: $0.key, type: $0.value, required: required.contains($0.key)) }
+                let keys = properties.map {
+                    KeyType(name: $0.key, type: $0.value, required: required.contains($0.key))
+                }
 
-                if let reference = try? container.decodeIfPresent(Reference.self, forKey: .additionalProperties) {
+                if let reference = try? container.decodeIfPresent(
+                    Reference.self,
+                    forKey: .additionalProperties
+                ) {
                     self.type = .dictionary(valueType: .reference(reference.ref), keys: keys)
-                } else if let schema = try? container.decodeIfPresent(Schema.self, forKey: .additionalProperties) {
+                } else if let schema = try? container.decodeIfPresent(
+                    Schema.self,
+                    forKey: .additionalProperties
+                ) {
                     self.type = .dictionary(valueType: .schema(schema), keys: keys)
-                } else if let boolValue = try? container.decodeIfPresent(Bool.self, forKey: .additionalProperties) {
-                    guard boolValue == true else { fatalError("additionalProperties set to false doesnt have any meaning") }
+                } else if let boolValue = try? container.decodeIfPresent(
+                    Bool.self,
+                    forKey: .additionalProperties
+                ) {
+                    guard boolValue == true else {
+                        fatalError("additionalProperties set to false doesnt have any meaning")
+                    }
                     self.type = .dictionary(valueType: .any, keys: keys)
                 } else {
                     self.type = .dictionary(valueType: .any, keys: keys)
                 }
             case .normal:
                 var allOf: [Node<Schema>] = []
-                if let allOfElements = try container.decodeIfPresent([NodeWrapper<Schema>].self, forKey: .allOf) {
-                        allOf = allOfElements.map { $0.value }
-                    }
+                if let allOfElements = try container.decodeIfPresent(
+                    [NodeWrapper<Schema>].self,
+                    forKey: .allOf
+                ) {
+                    allOf = allOfElements.map { $0.value }
+                }
 
-                let properties = try container.decodeIfPresent([String: NodeWrapper<Schema>].self, forKey: .properties)?
-                    .compactMapValues { $0.value }
+                let properties = try container.decodeIfPresent(
+                    [String: NodeWrapper<Schema>].self,
+                    forKey: .properties
+                )?
+                .compactMapValues { $0.value }
 
                 self.type = .object(properties: properties ?? [:], allOf: allOf)
             }
         case "string":
             let defaultValue = try container.decodeIfPresent(String.self, forKey: .defaultValue)
-            self.type = .string(format: format, enumValues: enumeration, maxLength: maxLength, minLength: minLength, pattern: pattern, defaultValue: defaultValue)
+            self.type = .string(
+                format: format,
+                enumValues: enumeration,
+                maxLength: maxLength,
+                minLength: minLength,
+                pattern: pattern,
+                defaultValue: defaultValue
+            )
         case "number":
             let defaultValue = try container.decodeIfPresent(Double.self, forKey: .defaultValue)
-            self.type = .number(format: format, maximum: maximum, exclusiveMaximum: exclusiveMaximum, minimum: minimum, exclusiveMinimum: excluesiveMinimum, multipleOf: multipleOf, defaultValue: defaultValue)
+            self.type = .number(
+                format: format,
+                maximum: maximum,
+                exclusiveMaximum: exclusiveMaximum,
+                minimum: minimum,
+                exclusiveMinimum: excluesiveMinimum,
+                multipleOf: multipleOf,
+                defaultValue: defaultValue
+            )
         case "integer":
             let defaultValue = try container.decodeIfPresent(Int.self, forKey: .defaultValue)
-            self.type = .integer(format: format, maximum: maximum, exclusiveMaximum: exclusiveMaximum, minimum: minimum, exclusiveMinimum: excluesiveMinimum, multipleOf: multipleOf, defaultValue: defaultValue)
+            self.type = .integer(
+                format: format,
+                maximum: maximum,
+                exclusiveMaximum: exclusiveMaximum,
+                minimum: minimum,
+                exclusiveMinimum: excluesiveMinimum,
+                multipleOf: multipleOf,
+                defaultValue: defaultValue
+            )
         case "boolean":
             let defaultValue = try container.decodeIfPresent(Bool.self, forKey: .defaultValue)
             self.type = .boolean(defaultValue: defaultValue)
         case "array":
             let uniqueItems = (try container.decodeIfPresent(Bool.self, forKey: .uniqueItems) ?? false)
-            let collectionFormat = (try container.decodeIfPresent(CollectionFormat.self, forKey: .collectionFormat)) ?? .csv
+            let collectionFormat =
+                (try container.decodeIfPresent(CollectionFormat.self, forKey: .collectionFormat)) ?? .csv
 
             let node: Node<Items>
             if let ref = try? container.decode(Reference.self, forKey: .items) {
@@ -181,11 +246,13 @@ public struct Schema: Decodable {
                 throw SwaggerError.corruptFile
             }
 
-            self.type = .array(node,
-                               collectionFormat: collectionFormat,
-                               maxItems: maxItems,
-                               minItems: minItems,
-                               uniqueItems: uniqueItems)
+            self.type = .array(
+                node,
+                collectionFormat: collectionFormat,
+                maxItems: maxItems,
+                minItems: minItems,
+                uniqueItems: uniqueItems
+            )
         case "file":
             self.type = .file
         default:

@@ -1,6 +1,7 @@
-import XCTest
 import Foundation
+import XCTest
 import Yams
+
 @testable import SwaggerSwiftML
 
 class DictionarySchemaTests: XCTestCase {
@@ -34,9 +35,15 @@ class DictionarySchemaTests: XCTestCase {
             if case let DictionaryValueType.schema(schema) = valueType {
                 if case SchemaType.string = schema.type {
                     XCTAssert(true)
-                } else { XCTAssert(false) }
-            } else { XCTAssert(false) }
-        } else { XCTAssert(false) }
+                } else {
+                    XCTAssert(false)
+                }
+            } else {
+                XCTAssert(false)
+            }
+        } else {
+            XCTAssert(false)
+        }
 
         if case let SchemaType.dictionary(_, requiredKeys) = schema.type {
             XCTAssertEqual(requiredKeys.count, 1)
@@ -49,7 +56,9 @@ class DictionarySchemaTests: XCTestCase {
             XCTAssertEqual(key.name, "default")
             XCTAssertNotNil(key.type)
             XCTAssertTrue(key.required)
-        } else { XCTAssert(false) }
+        } else {
+            XCTAssert(false)
+        }
     }
 
     func testParseValueIsInlineObjectDictionary() {
@@ -63,19 +72,25 @@ class DictionarySchemaTests: XCTestCase {
 
                     if case SchemaType.integer = codeProp.type {
                         XCTAssert(true)
-                    } else { XCTAssert(false) }
+                    } else {
+                        XCTAssert(false)
+                    }
 
                     let textProp = props["text"]!.unwrapped!
 
                     if case SchemaType.string = textProp.type {
                         XCTAssert(true)
-                    } else { XCTAssert(false) }
+                    } else {
+                        XCTAssert(false)
+                    }
                 }
                 XCTAssert(true)
             } else {
                 XCTAssert(false)
             }
-        } else { XCTAssert(false) }
+        } else {
+            XCTAssert(false)
+        }
     }
 
     func testParseValueIsInlineReferenceDictionary() {
@@ -88,7 +103,9 @@ class DictionarySchemaTests: XCTestCase {
             } else {
                 XCTAssert(false)
             }
-        } else { XCTAssert(false) }
+        } else {
+            XCTAssert(false)
+        }
     }
 }
 

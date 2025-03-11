@@ -1,6 +1,7 @@
-import XCTest
 import Foundation
+import XCTest
 import Yams
+
 @testable import SwaggerSwiftML
 
 class FreeFormObjectTests: XCTestCase {
@@ -17,7 +18,9 @@ class FreeFormObjectTests: XCTestCase {
 
         if case SchemaType.freeform = schema.type {
             XCTAssert(true)
-        } else { XCTAssert(false) }
+        } else {
+            XCTAssert(false)
+        }
     }
 
     func testParseFreeformEmptyObjectWithEmptyAdditionalProperties() {
@@ -25,7 +28,9 @@ class FreeFormObjectTests: XCTestCase {
 
         if case SchemaType.freeform = schema.type {
             XCTAssert(true)
-        } else { XCTAssert(false) }
+        } else {
+            XCTAssert(false)
+        }
     }
 
     func testParseFreeformEmptyObjectWithFalseAdditionalProperties() {
@@ -33,7 +38,9 @@ class FreeFormObjectTests: XCTestCase {
 
         if case SchemaType.freeform = schema.type {
             XCTAssert(true)
-        } else { XCTAssert(false) }
+        } else {
+            XCTAssert(false)
+        }
     }
 
     func testParseFreeformEmptyObjectWithTypeObjectInAdditionalProperties() {
@@ -41,6 +48,8 @@ class FreeFormObjectTests: XCTestCase {
 
         if case SchemaType.freeform = schema.type {
             XCTAssert(true)
-        } else { XCTAssert(false) }
+        } else {
+            XCTAssert(false)
+        }
     }
 }

@@ -14,7 +14,9 @@ public enum FileFormat {
 }
 
 public struct SwaggerReader {
-    public static func readFile(atPath path: String, fileManager: FileManager = FileManager.default) throws -> Swagger {
+    public static func readFile(atPath path: String, fileManager: FileManager = FileManager.default)
+        throws -> Swagger
+    {
         guard let swaggerFileData = fileManager.contents(atPath: path) else {
             throw SwaggerError.fileNotFound
         }
@@ -38,10 +40,16 @@ public struct SwaggerReader {
 
     }
 
-    public static func read(text: String, format: FileFormat = .yaml, fileManager: FileManager = FileManager.default) throws -> Swagger {
+    public static func read(
+        text: String,
+        format: FileFormat = .yaml,
+        fileManager: FileManager = FileManager.default
+    ) throws -> Swagger {
         switch format {
         case .json:
-            guard let data = text.data(using: .utf8) else { fatalError("Failed to convert string to data - what gives?") }
+            guard let data = text.data(using: .utf8) else {
+                fatalError("Failed to convert string to data - what gives?")
+            }
             return try JSONDecoder().decode(Swagger.self, from: data)
         case .yaml:
             return try YAMLDecoder().decode(Swagger.self, from: text)

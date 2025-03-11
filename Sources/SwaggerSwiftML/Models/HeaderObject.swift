@@ -1,10 +1,36 @@
 public struct HeaderObject: Decodable {
     public enum HeaderType {
-        case string(format: DataFormat?, enumValues: [String]?, maxLength: Int?, minLength: Int?, pattern: String?)
-        case number(format: DataFormat?, maximum: Int?, exclusiveMaximum: Bool?, minimum: Int?, exclusiveMinimum: Bool?, multipleOf: Int?)
-        case integer(format: DataFormat?, maximum: Int?, exclusiveMaximum: Bool?, minimum: Int?, exclusiveMinimum: Bool?, multipleOf: Int?)
+        case string(
+            format: DataFormat?,
+            enumValues: [String]?,
+            maxLength: Int?,
+            minLength: Int?,
+            pattern: String?
+        )
+        case number(
+            format: DataFormat?,
+            maximum: Int?,
+            exclusiveMaximum: Bool?,
+            minimum: Int?,
+            exclusiveMinimum: Bool?,
+            multipleOf: Int?
+        )
+        case integer(
+            format: DataFormat?,
+            maximum: Int?,
+            exclusiveMaximum: Bool?,
+            minimum: Int?,
+            exclusiveMinimum: Bool?,
+            multipleOf: Int?
+        )
         case boolean
-        case array(Node<Items>, collectionFormat: CollectionFormat, maxItems: Int?, minItems: Int?, uniqueItems: Bool)
+        case array(
+            Node<Items>,
+            collectionFormat: CollectionFormat,
+            maxItems: Int?,
+            minItems: Int?,
+            uniqueItems: Bool
+        )
     }
 
     enum CodingKeys: String, CodingKey {
@@ -56,7 +82,9 @@ public struct HeaderObject: Decodable {
         let enumeration = try container.decodeIfPresent([String].self, forKey: .enumeration)
 
         let unknownKeysContainer = try decoder.container(keyedBy: RawCodingKeys.self)
-        let keys = unknownKeysContainer.allKeys.filter { $0.stringValue.starts(with: "x-", by: { $0 == $1  }) }
+        let keys = unknownKeysContainer.allKeys.filter {
+            $0.stringValue.starts(with: "x-", by: { $0 == $1 })
+        }
 
         var customFields = [String: String]()
         keys.map { ($0.stringValue, try? unknownKeysContainer.decode(String.self, forKey: $0)) }
@@ -67,16 +95,37 @@ public struct HeaderObject: Decodable {
 
         switch type {
         case "string":
-            self.type = .string(format: format, enumValues: enumeration, maxLength: maxLength, minLength: minLength, pattern: pattern)
+            self.type = .string(
+                format: format,
+                enumValues: enumeration,
+                maxLength: maxLength,
+                minLength: minLength,
+                pattern: pattern
+            )
         case "number":
-            self.type = .number(format: format, maximum: maximum, exclusiveMaximum: exclusiveMaximum, minimum: minimum, exclusiveMinimum: excluesiveMinimum, multipleOf: multipleOf)
+            self.type = .number(
+                format: format,
+                maximum: maximum,
+                exclusiveMaximum: exclusiveMaximum,
+                minimum: minimum,
+                exclusiveMinimum: excluesiveMinimum,
+                multipleOf: multipleOf
+            )
         case "integer":
-            self.type = .integer(format: format, maximum: maximum, exclusiveMaximum: exclusiveMaximum, minimum: minimum, exclusiveMinimum: excluesiveMinimum, multipleOf: multipleOf)
+            self.type = .integer(
+                format: format,
+                maximum: maximum,
+                exclusiveMaximum: exclusiveMaximum,
+                minimum: minimum,
+                exclusiveMinimum: excluesiveMinimum,
+                multipleOf: multipleOf
+            )
         case "boolean":
             self.type = .boolean
         case "array":
             let uniqueItems = (try container.decodeIfPresent(Bool.self, forKey: .uniqueItems) ?? false)
-            let collectionFormat = (try container.decodeIfPresent(CollectionFormat.self, forKey: .collectionFormat)) ?? .csv
+            let collectionFormat =
+                (try container.decodeIfPresent(CollectionFormat.self, forKey: .collectionFormat)) ?? .csv
 
             let node: Node<Items>
             if let itemsObject = try? container.decode(Items.self, forKey: .items) {
@@ -87,11 +136,13 @@ public struct HeaderObject: Decodable {
                 throw SwaggerError.corruptFile
             }
 
-            self.type = .array(node,
-                               collectionFormat: collectionFormat,
-                               maxItems: maxItems,
-                               minItems: minItems,
-                               uniqueItems: uniqueItems)
+            self.type = .array(
+                node,
+                collectionFormat: collectionFormat,
+                maxItems: maxItems,
+                minItems: minItems,
+                uniqueItems: uniqueItems
+            )
         default:
             throw SchemaParseError.invalidType("Unsupported type: \(type) found on a schema")
         }
