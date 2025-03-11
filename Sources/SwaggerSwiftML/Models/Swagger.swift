@@ -68,9 +68,18 @@ public struct Swagger: Decodable {
         self.definitions = try container.decodeIfPresent([String: Schema].self, forKey: .definitions)
         self.parameters = try container.decodeIfPresent([String: Parameter].self, forKey: .parameters)
         self.responses = try container.decodeIfPresent([String: Response].self, forKey: .responses)
-        self.securityDefinitions = try container.decodeIfPresent([String: SecurityDefinition].self, forKey: .securityDefinitions)
-        self.security = try container.decodeIfPresent([String: SecurityRequirement].self, forKey: .security)
+        self.securityDefinitions = try container.decodeIfPresent(
+            [String: SecurityDefinition].self,
+            forKey: .securityDefinitions
+        )
+        self.security = try container.decodeIfPresent(
+            [String: SecurityRequirement].self,
+            forKey: .security
+        )
         self.tags = try container.decodeIfPresent([Tag].self, forKey: .tags)
-        self.externalDocs = try container.decodeIfPresent([ExternalDocumentation].self, forKey: .externalDocs)
+        self.externalDocs = try container.decodeIfPresent(
+            [ExternalDocumentation].self,
+            forKey: .externalDocs
+        )
     }
 }

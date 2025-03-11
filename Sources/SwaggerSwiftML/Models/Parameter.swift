@@ -44,7 +44,7 @@ public struct Parameter: Decodable {
         let required = try container.decodeIfPresent(Bool.self, forKey: .required)
         self.required = required ?? false
 
-        let typeString = try container.decodeIfPresent(String.self, forKey: .type) // ParameterType
+        let typeString = try container.decodeIfPresent(String.self, forKey: .type)  // ParameterType
         let format = try container.decodeIfPresent(DataFormat.self, forKey: .format)
 
         let maximum = try container.decodeIfPresent(Int.self, forKey: .maximum)
@@ -63,7 +63,8 @@ public struct Parameter: Decodable {
         switch typeString {
         case "array":
             let uniqueItems = try container.decodeIfPresent(Bool.self, forKey: .uniqueItems)
-            let collectionFormat = (try container.decodeIfPresent(CollectionFormat.self, forKey: .collectionFormat)) ?? .csv
+            let collectionFormat =
+                (try container.decodeIfPresent(CollectionFormat.self, forKey: .collectionFormat)) ?? .csv
 
             if let items = try? container.decode(Items.self, forKey: .items) {
                 type = .array(
@@ -125,7 +126,8 @@ public struct Parameter: Decodable {
             self.location = .body(schema: schema)
         case "query":
             guard let stype = type else { throw SwaggerParseError.missingField }
-            let allowEmptyValue = (try container.decodeIfPresent(Bool.self, forKey: .allowEmptyValue)) ?? false
+            let allowEmptyValue =
+                (try container.decodeIfPresent(Bool.self, forKey: .allowEmptyValue)) ?? false
             self.location = .query(type: stype, allowEmptyValue: allowEmptyValue)
         case "header":
             guard let stype = type else { throw SwaggerParseError.missingField }
@@ -135,7 +137,8 @@ public struct Parameter: Decodable {
             self.location = .path(type: stype)
         case "formData":
             guard let stype = type else { throw SwaggerParseError.missingField }
-            let allowEmptyValue = (try container.decodeIfPresent(Bool.self, forKey: .allowEmptyValue)) ?? false
+            let allowEmptyValue =
+                (try container.decodeIfPresent(Bool.self, forKey: .allowEmptyValue)) ?? false
             self.location = .formData(type: stype, allowEmptyValue: allowEmptyValue)
         default:
             throw SwaggerParseError.invalidField(location)
@@ -143,4 +146,4 @@ public struct Parameter: Decodable {
     }
 }
 
-struct InvalidArrayType: Error { }
+struct InvalidArrayType: Error {}

@@ -3,7 +3,7 @@ import Foundation
 /// Describes a single API operation on a path.
 public struct Operation: Decodable {
     /// A list of tags for API documentation control. Tags can be used for logical grouping of operations by resources or any other qualifier.
-//    public let tags: [Tag]?
+    //    public let tags: [Tag]?
     /// A short summary of what the operation does. For maximum readability in the swagger-ui, this field SHOULD be less than 120 characters.
     public let summary: String?
     /// A verbose explanation of the operation behavior. GFM syntax can be used for rich text representation.
@@ -25,7 +25,7 @@ public struct Operation: Decodable {
     /// Declares this operation to be deprecated. Usage of the declared operation should be refrained. Default value is false.
     public let deprecated: Bool
     /// A declaration of which security schemes are applied for this operation. The list of values describes alternative security schemes that can be used (that is, there is a logical OR between the security requirements). This definition overrides any declared top-level security. To remove a top-level security declaration, an empty array can be used.
-//    public let security: SecurityRequirement?
+    //    public let security: SecurityRequirement?
     public let customFields: [String: String]
 
     enum CodingKeys: String, CodingKey {
@@ -45,7 +45,7 @@ public struct Operation: Decodable {
 
     public init(from decoder: Decoder) throws {
         let con = try decoder.container(keyedBy: CodingKeys.self)
-//        self.tags = try con.decodeIfPresent([Tag].self, forKey: .tags)
+        //        self.tags = try con.decodeIfPresent([Tag].self, forKey: .tags)
         self.summary = try con.decodeIfPresent(String.self, forKey: .summary)
         self.description = try con.decodeIfPresent(String.self, forKey: .description)
         self.externalDocs = try con.decodeIfPresent([ExternalDocumentation].self, forKey: .externalDocs)
@@ -72,7 +72,9 @@ public struct Operation: Decodable {
         }
 
         let unknownKeysContainer = try decoder.container(keyedBy: RawCodingKeys.self)
-        let keys = unknownKeysContainer.allKeys.filter { $0.stringValue.starts(with: "x-", by: { $0 == $1  }) }
+        let keys = unknownKeysContainer.allKeys.filter {
+            $0.stringValue.starts(with: "x-", by: { $0 == $1 })
+        }
 
         var customFields = [String: String]()
         keys.map { ($0.stringValue, try? unknownKeysContainer.decode(String.self, forKey: $0)) }
@@ -81,8 +83,8 @@ public struct Operation: Decodable {
 
         self.schemes = try con.decodeIfPresent([Scheme].self, forKey: .schemes)
         self.deprecated = try con.decodeIfPresent(Bool.self, forKey: .deprecated) ?? false
-//        self.security = try con.decodeIfPresent(SecurityRequirement.self, forKey: .security)
+        //        self.security = try con.decodeIfPresent(SecurityRequirement.self, forKey: .security)
     }
 }
 
-struct UnknownObject: Error { }
+struct UnknownObject: Error {}

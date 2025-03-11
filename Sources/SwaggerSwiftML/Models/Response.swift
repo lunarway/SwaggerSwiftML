@@ -14,11 +14,11 @@ public struct Response: Decodable {
         case headers
     }
 
-	public init(schema: Schema) {
-		self.schema = Node.node(schema)
-		self.description = nil
-		self.headers = nil
-	}
+    public init(schema: Schema) {
+        self.schema = Node.node(schema)
+        self.description = nil
+        self.headers = nil
+    }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -26,7 +26,10 @@ public struct Response: Decodable {
         self.schema = try container.decodeIfPresent(NodeWrapper<Schema>.self, forKey: .schema)?.value
 
         if container.contains(.headers) {
-            let headerKeysContainer = try container.nestedContainer(keyedBy: RawCodingKeys.self, forKey: .headers)
+            let headerKeysContainer = try container.nestedContainer(
+                keyedBy: RawCodingKeys.self,
+                forKey: .headers
+            )
 
             var headers = [String: HeaderObject]()
             try headerKeysContainer.allKeys.map {

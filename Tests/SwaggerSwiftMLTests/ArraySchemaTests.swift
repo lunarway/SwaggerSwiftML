@@ -1,6 +1,7 @@
-import XCTest
 import Foundation
+import XCTest
 import Yams
+
 @testable import SwaggerSwiftML
 
 class ArraySchemaTests: XCTestCase {
@@ -14,7 +15,13 @@ class ArraySchemaTests: XCTestCase {
 
     func testParseArray() {
         let schema = load_schema(path: "Schemas/arrays/array")
-        if case let SchemaType.array(items, collectionFormat: _, maxItems: _, minItems: _, uniqueItems: _) = schema.type {
+        if case let SchemaType.array(
+            items,
+            collectionFormat: _,
+            maxItems: _,
+            minItems: _,
+            uniqueItems: _
+        ) = schema.type {
             XCTAssert(true)
         } else {
             XCTAssert(false)
@@ -23,7 +30,13 @@ class ArraySchemaTests: XCTestCase {
 
     func testParseArrayRequired() {
         let schema = load_schema(path: "Schemas/arrays/array")
-        if case let SchemaType.array(items, collectionFormat: _, maxItems: _, minItems: _, uniqueItems: _) = schema.type {
+        if case let SchemaType.array(
+            items,
+            collectionFormat: _,
+            maxItems: _,
+            minItems: _,
+            uniqueItems: _
+        ) = schema.type {
             switch items {
             case .node(let items):
                 switch items.type {

@@ -5,4 +5,4 @@ public enum CollectionFormat: String, Codable {
     case pipes
 }
 
-extension CollectionFormat: Equatable { }
+extension CollectionFormat: Equatable {}

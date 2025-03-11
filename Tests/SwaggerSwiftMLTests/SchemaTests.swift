@@ -1,11 +1,15 @@
-import XCTest
 import Foundation
+import XCTest
 import Yams
+
 @testable import SwaggerSwiftML
 
 class SchemaTests: XCTestCase {
     func testParsePrimitiveSchema() {
-        let basicFileUrl = Bundle.module.url(forResource: "Schemas/PrimitiveSchema", withExtension: "yaml")
+        let basicFileUrl = Bundle.module.url(
+            forResource: "Schemas/PrimitiveSchema",
+            withExtension: "yaml"
+        )
 
         let fileContents = try! String(contentsOf: basicFileUrl!, encoding: .utf8)
 
@@ -37,7 +41,7 @@ class SchemaTests: XCTestCase {
                 XCTAssert(false, "should not find a reference")
             case .node(let property):
                 switch property.type {
-                case .string(format: let format, enumValues: let enumValues, maxLength: let maxLength, minLength: let minLength, pattern: let pattern, _):
+                case .string(let format, let enumValues, let maxLength, let minLength, let pattern, _):
                     XCTAssertNil(format)
                     XCTAssertNil(enumValues)
                     XCTAssertNil(maxLength)
@@ -64,7 +68,15 @@ class SchemaTests: XCTestCase {
                 XCTAssert(false, "should not find a reference")
             case .node(let property):
                 switch property.type {
-                case .integer(format: let format, maximum: let maximum, exclusiveMaximum: let exclusiveMaximum, minimum: let minimum, exclusiveMinimum: let exclusiveMinimum, multipleOf: let multipleOf, _):
+                case .integer(
+                    let format,
+                    let maximum,
+                    let exclusiveMaximum,
+                    let minimum,
+                    let exclusiveMinimum,
+                    let multipleOf,
+                    _
+                ):
                     XCTAssertNotNil(format)
                     XCTAssertEqual(format!, .int32)
                     XCTAssertEqual(minimum!, 0)
@@ -95,7 +107,10 @@ class SchemaTests: XCTestCase {
     // MARK: Definitions
 
     func testParseSimpleDefinition() {
-        let basicFileUrl = Bundle.module.url(forResource: "Schemas/definition_schema", withExtension: "yaml")
+        let basicFileUrl = Bundle.module.url(
+            forResource: "Schemas/definition_schema",
+            withExtension: "yaml"
+        )
 
         let fileContents = try! String(contentsOf: basicFileUrl!, encoding: .utf8)
 
@@ -109,7 +124,10 @@ class SchemaTests: XCTestCase {
     }
 
     func testParseComplexDefinition() {
-        let basicFileUrl = Bundle.module.url(forResource: "Schemas/complex_model", withExtension: "yaml")
+        let basicFileUrl = Bundle.module.url(
+            forResource: "Schemas/complex_model",
+            withExtension: "yaml"
+        )
 
         let fileContents = try! String(contentsOf: basicFileUrl!, encoding: .utf8)
 
@@ -125,7 +143,10 @@ class SchemaTests: XCTestCase {
     // MARK: Array
 
     func testArrayWithObjectReference() {
-        let basicFileUrl = Bundle.module.url(forResource: "Items/items_object_ref", withExtension: "yaml")
+        let basicFileUrl = Bundle.module.url(
+            forResource: "Items/items_object_ref",
+            withExtension: "yaml"
+        )
 
         let fileContents = try! String(contentsOf: basicFileUrl!, encoding: .utf8)
 
@@ -146,20 +167,29 @@ class SchemaTests: XCTestCase {
     // MARK: AnyOf
 
     func testParseAnyOfObjects() {
-        let basicFileUrl = Bundle.module.url(forResource: "Schemas/allOf/allof_object", withExtension: "yaml")
+        let basicFileUrl = Bundle.module.url(
+            forResource: "Schemas/allOf/allof_object",
+            withExtension: "yaml"
+        )
 
         let fileContents = try! String(contentsOf: basicFileUrl!, encoding: .utf8)
 
         let schema = try! YAMLDecoder().decode(Schema.self, from: fileContents)
 
-        guard case let SchemaType.object(properties: properties, allOf) = schema.type else { XCTAssert(false); return }
+        guard case let SchemaType.object(properties: properties, allOf) = schema.type else {
+            XCTAssert(false)
+            return
+        }
 
         XCTAssert(properties.isEmpty)
         XCTAssertEqual(allOf?.count, 2)
     }
 
     func testCannotParseInvalidAnyOfObjects() {
-        let basicFileUrl = Bundle.module.url(forResource: "Schemas/allOf/invalid_allof", withExtension: "yaml")
+        let basicFileUrl = Bundle.module.url(
+            forResource: "Schemas/allOf/invalid_allof",
+            withExtension: "yaml"
+        )
 
         let fileContents = try! String(contentsOf: basicFileUrl!, encoding: .utf8)
 

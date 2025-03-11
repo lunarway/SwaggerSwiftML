@@ -12,7 +12,10 @@ public enum Node<T: Decodable>: Decodable {
         } else if let prop = try? container.decode(T.self) {
             self = .node(prop)
         } else {
-            throw DecodingError.valueNotFound(Node.self, .init(codingPath: decoder.codingPath, debugDescription: "Failed to decode node"))
+            throw DecodingError.valueNotFound(
+                Node.self,
+                .init(codingPath: decoder.codingPath, debugDescription: "Failed to decode node")
+            )
         }
     }
 }

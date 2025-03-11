@@ -44,7 +44,12 @@ public struct SecurityRequirement: Decodable {
             let authorizationUrl = try container.decode(String.self, forKey: .authorizationUrl)
             let tokenUrl = try container.decode(String.self, forKey: .tokenUrl)
             let scopes = try container.decode([String: String].self, forKey: .scopes)
-            self.type = .oauth2(flow: flow, authorizationUrl: authorizationUrl, tokenUrl: tokenUrl, scopes: scopes)
+            self.type = .oauth2(
+                flow: flow,
+                authorizationUrl: authorizationUrl,
+                tokenUrl: tokenUrl,
+                scopes: scopes
+            )
         default:
             fatalError("Unknown security type: \(typeString)")
         }

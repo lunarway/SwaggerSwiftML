@@ -1,9 +1,35 @@
 public indirect enum ItemsType {
-    case string(format: DataFormat?, enumValues: [String]?, maxLength: Int?, minLength: Int?, pattern: String?)
-    case number(format: DataFormat?, maximum: Int?, exclusiveMaximum: Bool?, minimum: Int?, exclusiveMinimum: Bool?, multipleOf: Int?)
-    case integer(format: DataFormat?, maximum: Int?, exclusiveMaximum: Bool?, minimum: Int?, exclusiveMinimum: Bool?, multipleOf: Int?)
+    case string(
+        format: DataFormat?,
+        enumValues: [String]?,
+        maxLength: Int?,
+        minLength: Int?,
+        pattern: String?
+    )
+    case number(
+        format: DataFormat?,
+        maximum: Int?,
+        exclusiveMaximum: Bool?,
+        minimum: Int?,
+        exclusiveMinimum: Bool?,
+        multipleOf: Int?
+    )
+    case integer(
+        format: DataFormat?,
+        maximum: Int?,
+        exclusiveMaximum: Bool?,
+        minimum: Int?,
+        exclusiveMinimum: Bool?,
+        multipleOf: Int?
+    )
     case boolean
-    case array(Items, collectionFormat: CollectionFormat, maxItems: Int?, minItems: Int?, uniqueItems: Bool)
+    case array(
+        Items,
+        collectionFormat: CollectionFormat,
+        maxItems: Int?,
+        minItems: Int?,
+        uniqueItems: Bool
+    )
     case object(required: [String], properties: [String: Node<Schema>], allOf: [Node<Schema>]?)
 }
 
@@ -55,7 +81,9 @@ public struct Items: Decodable {
         let required = try container.decodeIfPresent([String].self, forKey: .required)
 
         let unknownKeysContainer = try decoder.container(keyedBy: RawCodingKeys.self)
-        let keys = unknownKeysContainer.allKeys.filter { $0.stringValue.starts(with: "x-", by: { $0 == $1  }) }
+        let keys = unknownKeysContainer.allKeys.filter {
+            $0.stringValue.starts(with: "x-", by: { $0 == $1 })
+        }
 
         var customFields = [String: String]()
         keys.map { ($0.stringValue, try? unknownKeysContainer.decode(String.self, forKey: $0)) }
@@ -75,17 +103,44 @@ public struct Items: Decodable {
 
         switch type {
         case "array":
-            let collectionFormat = (try container.decodeIfPresent(CollectionFormat.self, forKey: .collectionFormat)) ?? .csv
+            let collectionFormat =
+                (try container.decodeIfPresent(CollectionFormat.self, forKey: .collectionFormat)) ?? .csv
             let items = try container.decode(Items.self, forKey: .items)
-            self.type = .array(items, collectionFormat: collectionFormat, maxItems: maxItems, minItems: minItems, uniqueItems: uniqueItems ?? false)
+            self.type = .array(
+                items,
+                collectionFormat: collectionFormat,
+                maxItems: maxItems,
+                minItems: minItems,
+                uniqueItems: uniqueItems ?? false
+            )
         case "boolean":
             self.type = .boolean
         case "integer":
-            self.type = .integer(format: format, maximum: maximum, exclusiveMaximum: exclusiveMaximum, minimum: minimum, exclusiveMinimum: exclusiveMinimum, multipleOf: multipleOf)
+            self.type = .integer(
+                format: format,
+                maximum: maximum,
+                exclusiveMaximum: exclusiveMaximum,
+                minimum: minimum,
+                exclusiveMinimum: exclusiveMinimum,
+                multipleOf: multipleOf
+            )
         case "number":
-            self.type = .number(format: format, maximum: maximum, exclusiveMaximum: exclusiveMaximum, minimum: minimum, exclusiveMinimum: exclusiveMinimum, multipleOf: multipleOf)
+            self.type = .number(
+                format: format,
+                maximum: maximum,
+                exclusiveMaximum: exclusiveMaximum,
+                minimum: minimum,
+                exclusiveMinimum: exclusiveMinimum,
+                multipleOf: multipleOf
+            )
         case "string":
-            self.type = .string(format: format, enumValues: enumeration, maxLength: maxLength, minLength: minLength, pattern: pattern)
+            self.type = .string(
+                format: format,
+                enumValues: enumeration,
+                maxLength: maxLength,
+                minLength: minLength,
+                pattern: pattern
+            )
         case "object":
             let isDictionary = container.contains(.additionalProperties)
             if isDictionary {
@@ -95,12 +150,16 @@ public struct Items: Decodable {
             let allOf = try container.decodeIfPresent([NodeWrapper<Schema>].self, forKey: .allOf)
                 .map { $0.map { $0.value } }
 
-            let properties = try container.decodeIfPresent([String: NodeWrapper<Schema>].self,
-                                                           forKey: .properties)?.compactMapValues { $0.value }
+            let properties = try container.decodeIfPresent(
+                [String: NodeWrapper<Schema>].self,
+                forKey: .properties
+            )?.compactMapValues { $0.value }
 
-            self.type = .object(required: required ?? [],
-                                properties: properties ?? [:],
-                                allOf: allOf)
+            self.type = .object(
+                required: required ?? [],
+                properties: properties ?? [:],
+                allOf: allOf
+            )
         default:
             throw SwaggerParseError.invalidField(typeString ?? "No field found on Items")
         }

@@ -1,5 +1,6 @@
 import XCTest
 import Yams
+
 @testable import SwaggerSwiftML
 
 final class PathTests: XCTestCase {
